@@ -8,6 +8,7 @@ export const WapperCardStyle = styled(Card)`
         height: 220px;
     },
     position: relative;
+    border-radius: 0;
 `
 
 export const StyleNameProduct = styled.div`
@@ -23,6 +24,12 @@ export const WrapperReportText = styled.div`
     align-items: center;
     color: rgb(128,128,137);
     margin: 6px 0 0;
+`
+
+export const WrapperStyleTextSell = styled.span`
+    font-size: 14px;
+    line-height: 24px;
+    color: rgb(120, 120, 120);
 `
 
 export const WrapperPriceText = styled.div`

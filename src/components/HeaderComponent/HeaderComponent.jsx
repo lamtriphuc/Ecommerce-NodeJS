@@ -1,4 +1,4 @@
-import { Col } from 'antd'
+import { Badge, Col } from 'antd'
 import React from 'react'
 import { WapperHeader, WrapperHeaderAccount, WrapperTextHeader, WrapperTextHeaderSmall } from './style'
 import {
@@ -10,12 +10,12 @@ import ButtoninputSearch from '../ButtoninputSearch/ButtoninputSearch'
 
 const HeaderComponent = () => {
     return (
-        <div>
+        <div style={{ width: '100%', background: 'rgb(26, 148, 255)', display: 'flex', justifyContent: 'center' }}>
             <WapperHeader>
-                <Col span={6}>
+                <Col span={5}>
                     <WrapperTextHeader>LAMTRIPHUC</WrapperTextHeader>
                 </Col>
-                <Col span={12}>
+                <Col span={13}>
                     <ButtoninputSearch
                         size="large"
                         textButton="Tìm kiếm"
@@ -35,7 +35,9 @@ const HeaderComponent = () => {
                         </div>
                     </WrapperHeaderAccount>
                     <div>
-                        <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
+                        <Badge count={4} size='small'>
+                            <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
+                        </Badge>
                         <WrapperTextHeaderSmall>Giỏ hàng</WrapperTextHeaderSmall>
                     </div>
                 </Col>
