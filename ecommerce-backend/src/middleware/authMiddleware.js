@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const authMiddleware = (req, res, next) => {
+    console.log('>>> authMiddleware called at: ', req.path)
     if (!req.headers.token) {
         return res.status(401).json({
             status: 'ERROR',

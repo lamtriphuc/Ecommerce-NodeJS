@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from './style'
 import InputForm from '../../components/InputForm/InputForm'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
@@ -6,9 +6,30 @@ import { Image } from 'antd'
 import logoLogin from '../../assets/images/logo-login.png'
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { useMutationHooks } from '../../hooks/useMutationHook'
+import * as UserService from '../../services/UserService'
+import Loading from '../../components/LoadingComponent/Loading'
+import * as message from '../../components/Message/Message'
 
 const SignUpPage = () => {
   const navigate = useNavigate()
+
+  const mutation = useMutationHooks(
+    data => UserService.signUpUser(data)
+  )
+
+  const { data, isPending, isError, isSuccess } = mutation
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (data?.status === 'OK') {
+        handleNavigateSignIn();
+        message.success("Đăng ký tài khoản thành công!");
+      }
+    } else if (isError) {
+      message.error("Tài khoản đã tồn tại! Vui lòng nhập tài khoản khác!");
+    }
+  }, [isError, isSuccess])
 
   const [isShowPassword, setIsShowPassword] = useState(false)
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
@@ -17,7 +38,11 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const handleSignUp = () => {
-    console.log(email, password, confirmPassword)
+    mutation.mutate({
+      email,
+      password,
+      confirmPassword
+    })
   }
 
   const handleNavigateSignIn = () => {
@@ -74,21 +99,24 @@ const SignUpPage = () => {
             type={isShowConfirmPassword ? 'text' : 'password'}
             onChange={(e) => { setConfirmPassword(e.target.value) }}
           />
-          <ButtonComponent
-            disabled={!email.length || !password.length || !confirmPassword.length}
-            onClick={handleSignUp}
-            size={40}
-            styleButton={{
-              background: 'rgb(255, 66, 78)',
-              borderRadius: '2px',
-              border: 'none',
-              width: '100%',
-              height: '48px',
-              margin: '26px 0 10px'
-            }}
-            textButton={'Đăng ký'}
-            styleTextButton={{ color: '#fff' }}
-          ></ButtonComponent>
+          {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
+          <Loading isLoading={isPending}>
+            <ButtonComponent
+              disabled={!email.length || !password.length || !confirmPassword.length}
+              onClick={handleSignUp}
+              size={40}
+              styleButton={{
+                background: 'rgb(255, 66, 78)',
+                borderRadius: '2px',
+                border: 'none',
+                width: '100%',
+                height: '48px',
+                margin: '26px 0 10px'
+              }}
+              textButton={'Đăng ký'}
+              styleTextButton={{ color: '#fff' }}
+            ></ButtonComponent>
+          </Loading>
           <p>Bạn đã có tài khoản? <WrapperTextLight onClick={handleNavigateSignIn}> Đăng nhập</WrapperTextLight></p>
         </WrapperContainerLeft>
         <WrapperContainerRight>
