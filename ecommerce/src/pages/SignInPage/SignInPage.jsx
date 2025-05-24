@@ -17,9 +17,15 @@ const SignInPage = () => {
         data => UserService.loginUser(data)
     )
 
-    const { data, isPending, isError, isSuccess } = mutation
+    const { data, isPending, isSuccess } = mutation
 
-
+    useEffect(() => {
+        if (isSuccess && data?.status === 'OK') {
+            // navigate('/')
+            console.log('access_token', data.access_token)
+            localStorage.setItem('access_token', data?.access_token)
+        }
+    }, [isSuccess])
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -34,7 +40,6 @@ const SignInPage = () => {
             email,
             password
         })
-        console.log(mutation)
     }
 
     return (
@@ -61,12 +66,13 @@ const SignInPage = () => {
                             {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
                         </span>
                         <InputForm
+                            style={{ marginBottom: '10px' }}
                             placeholder='password'
                             type={isShowPassword ? 'text' : 'password'}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
+                    {data?.status === 'ERR' && <span style={{ color: 'red', marginTop: '5px' }}>{data?.message}</span>}
                     <Loading isLoading={isPending}>
                         <ButtonComponent
                             disabled={!email.length || !password.length}
@@ -78,7 +84,7 @@ const SignInPage = () => {
                                 border: 'none',
                                 width: '100%',
                                 height: '48px',
-                                margin: '26px 0 10px'
+                                margin: '20px 0 10px'
                             }}
                             textButton={'Đăng nhập'}
                             styleTextButton={{ color: '#fff' }}

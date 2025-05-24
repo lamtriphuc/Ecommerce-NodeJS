@@ -1,5 +1,3 @@
-import { Card, Image } from 'antd'
-import Meta from 'antd/es/card/Meta'
 import React from 'react'
 import { StyleNameProduct, WapperCardStyle, WrapperDiscountText, WrapperPriceText, WrapperReportText, WrapperStyleTextSell } from './style'
 import { StarFilled } from '@ant-design/icons'

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as UserService from '../../services/UserService'
 import Loading from '../../components/LoadingComponent/Loading'
-import * as message from '../../components/Message/Message'
+import * as message from '../../components/Message/MessageComponent'
 
 const SignUpPage = () => {
   const navigate = useNavigate()
@@ -21,15 +21,13 @@ const SignUpPage = () => {
   const { data, isPending, isError, isSuccess } = mutation
 
   useEffect(() => {
-    if (isSuccess) {
-      if (data?.status === 'OK') {
-        handleNavigateSignIn();
-        message.success("Đăng ký tài khoản thành công!");
-      }
+    if (isSuccess && data?.status === 'OK') {
+      message.success()
+      handleNavigateSignIn()
     } else if (isError) {
-      message.error("Tài khoản đã tồn tại! Vui lòng nhập tài khoản khác!");
+      message.error()
     }
-  }, [isError, isSuccess])
+  }, [isSuccess, isError])
 
   const [isShowPassword, setIsShowPassword] = useState(false)
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
@@ -48,6 +46,7 @@ const SignUpPage = () => {
   const handleNavigateSignIn = () => {
     navigate('/sign-in')
   }
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#ccc' }}>
       <div style={{ display: 'flex', width: '800px', height: '460px', borderRadius: '6px', background: '#fff' }}>
@@ -94,12 +93,13 @@ const SignUpPage = () => {
             </span>
           </div>
           <InputForm
+            style={{ marginBottom: '10px' }}
             placeholder='confirm password'
             value={confirmPassword}
             type={isShowConfirmPassword ? 'text' : 'password'}
             onChange={(e) => { setConfirmPassword(e.target.value) }}
           />
-          {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
+          {data?.status === 'ERR' && <span style={{ color: 'red', marginTop: '5px' }}>{data?.message}</span>}
           <Loading isLoading={isPending}>
             <ButtonComponent
               disabled={!email.length || !password.length || !confirmPassword.length}
@@ -111,7 +111,7 @@ const SignUpPage = () => {
                 border: 'none',
                 width: '100%',
                 height: '48px',
-                margin: '26px 0 10px'
+                margin: '20px 0 10px'
               }}
               textButton={'Đăng ký'}
               styleTextButton={{ color: '#fff' }}

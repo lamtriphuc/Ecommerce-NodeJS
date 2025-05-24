@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
-import axios from 'axios'
-import { useQuery } from '@tanstack/react-query'
+// import axios from 'axios'
+// import { useQuery } from '@tanstack/react-query'
 
 function App() {
 

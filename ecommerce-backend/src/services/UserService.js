@@ -52,7 +52,7 @@ const loginUser = (userLogin) => {
 
             if (!comparePassword) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'User or password incorrect',
                 })
             }
