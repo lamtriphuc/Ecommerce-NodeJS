@@ -52,8 +52,9 @@ const loginUser = async (req, res) => {
         const response = await UserService.loginUser(req.body);
         const { refresh_token, ...newResponse } = response
         res.cookie('refresh_token', refresh_token, {
-            HttpOnly: true,
-            Secure: true
+            httpOnly: true,
+            secure: false,
+            samesite: 'strict'
         })
         return res.status(200).json(newResponse);
     } catch (error) {
@@ -133,6 +134,7 @@ const getDetailsUser = async (req, res) => {
 }
 
 const refreshToken = async (req, res) => {
+    console.log('req.cookies.refresh_token', req.cookies.refresh_token)
     try {
         const token = req.cookies.refresh_token
         if (!token) {
