@@ -6,7 +6,7 @@ const generalAccessToken = async (payload) => {
     const access_token = jwt.sign(
         { ...payload },
         process.env.ACCESS_TOKEN,
-        { expiresIn: '10s' }
+        { expiresIn: '1d' }
     )
     return access_token
 }
@@ -15,7 +15,7 @@ const generalRefreshToken = async (payload) => {
     const refresh_token = jwt.sign(
         { ...payload },
         process.env.REFRESH_TOKEN,
-        { expiresIn: '1d' }
+        { expiresIn: '2d' }
     )
     return refresh_token
 }

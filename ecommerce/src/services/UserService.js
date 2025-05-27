@@ -32,3 +32,8 @@ export const logoutUser = async () => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/log-out`)
     return res.data
 }
+
+export const updateUser = async (id, data) => {
+    const res = await axios.put(`${process.env.REACT_APP_API_URL}/user/update-user/${id}`, data)
+    return res.data
+}
