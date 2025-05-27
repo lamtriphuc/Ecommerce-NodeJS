@@ -15,14 +15,15 @@ function App() {
 
   useEffect(() => {
     const { storageData, decoded } = handleDecoded()
-    if (decoded?.id) {
-      handleGetDetailsUser(decoded?.id, storageData)
+    if (!decoded?.id) {
+      return
     }
+    handleGetDetailsUser(decoded?.id, storageData)
   }, [])
 
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token')
-    let decoded = {}
+    let decoded = null
     if (storageData && isJsonString(storageData)) {
       storageData = JSON.parse(storageData)
       decoded = jwtDecode(storageData);
@@ -43,8 +44,10 @@ function App() {
   });
 
   const handleGetDetailsUser = async (id, token) => {
-    const res = await UserService.getDetailsUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token }))
+    try {
+      const res = await UserService.getDetailsUser(id, token);
+      dispatch(updateUser({ ...res?.data, access_token: token }));
+    } catch (error) { }
   }
 
   // const fetchApi = async () => {

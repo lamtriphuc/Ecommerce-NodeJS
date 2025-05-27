@@ -15,7 +15,7 @@ const generalRefreshToken = async (payload) => {
     const refresh_token = jwt.sign(
         { ...payload },
         process.env.REFRESH_TOKEN,
-        { expiresIn: '365d' }
+        { expiresIn: '1d' }
     )
     return refresh_token
 }
