@@ -1,3 +1,4 @@
+import { Upload } from "antd";
 import styled from "styled-components";
 
 export const WrapperHeader = styled.h1`
@@ -31,3 +32,9 @@ export const WrapperLabel = styled.label`
     width: 60px;
     text-align: left;
 `
+
+export const WrapperUploadFile = styled(Upload)`
+    .ant-upload-list-item-container{
+        display: none !important;
+    }
+    `

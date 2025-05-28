@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { WapperContentProfile, WrapperHeader, WrapperInput, WrapperLabel } from './style'
+import { WapperContentProfile, WrapperHeader, WrapperInput, WrapperLabel, WrapperUploadFile } from './style'
 import InputForm from '../../components/InputForm/InputForm'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as UserService from '../../services/UserService'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as message from '../../components/Message/MessageComponent'
+import { updateUser } from '../../redux/slides/userSlide'
+import { UploadOutlined } from '@ant-design/icons'
+import { Button, Upload } from 'antd'
+import { getBase64 } from '../../utils'
 
 const ProfilePage = () => {
+    const dispatch = useDispatch()
+
     const user = useSelector((state) => state.user)
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
@@ -17,10 +23,10 @@ const ProfilePage = () => {
     const [avatar, setAvatar] = useState('')
 
     const mutation = useMutationHooks(
-        ({ id, data }) => UserService.updateUser(id, data)
+        ({ id, data, access_token }) => UserService.updateUser(id, data, access_token)
     )
 
-    const { id, data, isPending, isSuccess, isError } = mutation
+    const { id, data, isPending } = mutation
 
     useEffect(() => {
         setEmail(user?.email)
@@ -28,16 +34,32 @@ const ProfilePage = () => {
         setPhone(user?.phone)
         setAddress(user?.address)
         setAvatar(user?.avatar)
+        console.log(mutation)
     }, [user])
+
+    const handleGetDetailsUser = async (id, token) => {
+        const res = await UserService.getDetailsUser(id, token)
+        dispatch(updateUser({ ...res?.data, access_token: token }))
+    }
+
+    const handleOnChangeAvatar = async ({ fileList }) => {
+        const file = fileList[0]
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setAvatar(file.preview)
+    }
 
     const handelUpdate = () => {
         mutation.mutate(
             {
                 id: user?._id,
-                data: { email, name, phone, address, avatar }
+                data: { email, name, phone, address, avatar },
+                access_token: user?.access_token
             },
             {
                 onSuccess: () => {
+                    handleGetDetailsUser(user?._id, user?.access_token)
                     message.success('Cập nhật thông tin thành công!')
                 },
                 onError: () => {
@@ -126,6 +148,33 @@ const ProfilePage = () => {
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                         />
+                        <ButtonComponent
+                            onClick={handelUpdate}
+                            size={40}
+                            styleButton={{
+                                borderRadius: '2px',
+                                border: '2px solid rgb(26,148,255)',
+                                width: 'fit-content',
+                                height: '34px',
+                                padding: '4px 6px'
+                            }}
+                            textButton={'Cập nhật'}
+                            styleTextButton={{ color: 'rgb(26,148,255)', fontWeight: '600' }}
+                        ></ButtonComponent>
+                    </WrapperInput>
+                    <WrapperInput>
+                        <WrapperLabel htmlFor='avatar' >Avatar</WrapperLabel>
+                        <WrapperUploadFile onChange={handleOnChangeAvatar} >
+                            <Button icon={<UploadOutlined />}>Upload</Button>
+                        </WrapperUploadFile>
+                        {avatar && (
+                            <img src={avatar} alt='avatar' style={{
+                                height: '60px',
+                                width: '60px',
+                                borderRadius: '50%',
+                                objectFit: 'cover'
+                            }} />
+                        )}
                         <ButtonComponent
                             onClick={handelUpdate}
                             size={40}

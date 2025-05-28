@@ -24,7 +24,7 @@ const HomePage = () => {
                 </WrapperTypeProduct>
             </div>
             <div className='body' style={{ backgroundColor: '#efefef', width: '100%' }}>
-                <div id='container' style={{ width: '1270px', margin: '0 auto', height: '1000px' }}>
+                <div id='container' style={{ width: '1270px', margin: '0 auto', height: '100%' }}>
                     <SliderComponent arrImages={[slider1, slider2, slider3, slider4]} />
                     <WrapperProducts>
                         <CardComponent />
@@ -39,7 +39,7 @@ const HomePage = () => {
                     <div style={{ width: '100%', display: 'flex', marginTop: '10px', justifyContent: 'center' }}>
                         <WrapperButtonMore textButton='Xem thêm' type='outline' styleButton={{
                             border: '1px solid rgb(11, 116, 229)', color: 'rgb(11, 116, 229)',
-                            width: '240px', height: '38px', borderRadius: '4px'
+                            width: '240px', height: '38px', borderRadius: '4px', marginBottom: '40px'
                         }} styleTextButton={{ fontWeight: '500' }} />
                     </div>
                 </div>
