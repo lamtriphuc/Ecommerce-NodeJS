@@ -1,0 +1,10 @@
+{
+"name": "project-root",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"yarn --cwd ecommerce start\" \"yarn --cwd ecommerce-backend start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
