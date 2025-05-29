@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { isJsonString } from './utils'
 import * as UserService from './services/UserService'
 import { jwtDecode } from 'jwt-decode'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateUser } from './redux/slides/userSlide'
 import axios from 'axios'
+import Loading from './components/LoadingComponent/Loading'
 // import { useQuery } from '@tanstack/react-query'
 
 function App() {
   const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState(false)
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
+    setIsLoading(true)
     const { storageData, decoded } = handleDecoded()
     if (!decoded?.id) {
       return
@@ -47,6 +51,7 @@ function App() {
     try {
       const res = await UserService.getDetailsUser(id, token);
       dispatch(updateUser({ ...res?.data, access_token: token }));
+      setIsLoading(false)
     } catch (error) { }
   }
 
@@ -60,21 +65,24 @@ function App() {
 
   return (
     <div>
-      <Router>
-        <Routes>
-          {routes.map((route) => {
-            const Page = route.page
-            const Layout = route.isShowHeader ? DefaultComponent : React.Fragment
-            return (
-              < Route key={route.path} path={route.path} element={
-                <Layout>
-                  <Page />
-                </Layout>
-              } />
-            )
-          })}
-        </Routes>
-      </Router>
+      <Loading isLoading={isLoading}>
+        <Router>
+          <Routes>
+            {routes.map((route) => {
+              const Page = route.page
+              const isCheckAuth = !route.isPrivate || user.isAdmin
+              const Layout = route.isShowHeader ? DefaultComponent : React.Fragment
+              return (
+                < Route key={route.path} path={isCheckAuth ? route.path : undefined} element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                } />
+              )
+            })}
+          </Routes>
+        </Router>
+      </Loading>
     </div>
   )
 }
