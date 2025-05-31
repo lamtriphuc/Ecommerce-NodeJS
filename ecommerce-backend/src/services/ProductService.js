@@ -9,8 +9,8 @@ const createProduct = (newProduct) => {
                 name: name
             })
             if (checkProduct !== null) {
-                resolve({
-                    status: 'OK',
+                return resolve({
+                    status: 'ERR',
                     message: 'The name of product is already'
                 })
             }

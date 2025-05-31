@@ -9,7 +9,7 @@ import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as message from '../../components/Message/MessageComponent'
 import { updateUser } from '../../redux/slides/userSlide'
 import { UploadOutlined } from '@ant-design/icons'
-import { Button, Upload } from 'antd'
+import { Button } from 'antd'
 import { getBase64 } from '../../utils'
 
 const ProfilePage = () => {
@@ -162,9 +162,9 @@ const ProfilePage = () => {
                             styleTextButton={{ color: 'rgb(26,148,255)', fontWeight: '600' }}
                         ></ButtonComponent>
                     </WrapperInput>
-                    <WrapperInput>
+                    <WrapperInput style={{ display: 'flex' }}>
                         <WrapperLabel htmlFor='avatar' >Avatar</WrapperLabel>
-                        <WrapperUploadFile onChange={handleOnChangeAvatar} >
+                        <WrapperUploadFile onChange={handleOnChangeAvatar} beforeUpload={() => false} >
                             <Button icon={<UploadOutlined />}>Upload</Button>
                         </WrapperUploadFile>
                         {avatar && (
