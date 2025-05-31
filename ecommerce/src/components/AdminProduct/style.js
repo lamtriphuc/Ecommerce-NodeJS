@@ -10,4 +10,10 @@ export const WrapperUploadFile = styled(Upload)`
     .ant-upload-list-item-container{
         display: none !important;
     }
+    .ant-upload {
+        display: flex;
+        width: 160px;
+        justify-content: space-between;
+        align-items: center;
+    }
 `

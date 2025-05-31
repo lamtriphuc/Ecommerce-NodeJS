@@ -42,6 +42,17 @@ const updateProduct = (id, data) => {
             const checkProduct = Product.findOne({
                 _id: id
             })
+            const checkProductName = Product.findOne({
+                name: name,
+                _id: { $ne: id }
+            })
+            if (checkProductName) {
+                return resolve({
+                    status: 'OK',
+                    message: 'Product name already exists'
+                })
+            }
+
             if (checkProduct === null) {
                 resolve({
                     status: 'OK',

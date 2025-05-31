@@ -28,8 +28,6 @@ const HomePage = () => {
 
     })
 
-    console.log('products: ', products)
-
     return (
         <>
             <div style={{ width: '1270px', margin: '0 auto' }}>

@@ -26,7 +26,7 @@ const updateProduct = async (req, res) => {
         const data = req.body
         if (!productId) {
             return res.status(200).json({
-                status: 'ERROR',
+                status: 'ERR',
                 message: 'The productId is required'
             })
         }

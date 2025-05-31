@@ -48,11 +48,11 @@ function App() {
   });
 
   const handleGetDetailsUser = async (id, token) => {
-    try {
-      const res = await UserService.getDetailsUser(id, token);
-      dispatch(updateUser({ ...res?.data, access_token: token }));
-      setIsLoading(false)
-    } catch (error) { }
+    // try {
+    const res = await UserService.getDetailsUser(id, token);
+    dispatch(updateUser({ ...res?.data, access_token: token }));
+    setIsLoading(false)
+    // } catch (error) { }
   }
 
   // const fetchApi = async () => {
@@ -65,24 +65,24 @@ function App() {
 
   return (
     <div>
-      <Loading isLoading={isLoading}>
-        <Router>
-          <Routes>
-            {routes.map((route) => {
-              const Page = route.page
-              const isCheckAuth = !route.isPrivate || user.isAdmin
-              const Layout = route.isShowHeader ? DefaultComponent : React.Fragment
-              return (
-                < Route key={route.path} path={isCheckAuth ? route.path : undefined} element={
-                  <Layout>
-                    <Page />
-                  </Layout>
-                } />
-              )
-            })}
-          </Routes>
-        </Router>
-      </Loading>
+      {/* <Loading isLoading={isLoading}> */}
+      <Router>
+        <Routes>
+          {routes.map((route) => {
+            const Page = route.page
+            const isCheckAuth = !route.isPrivate || user.isAdmin
+            const Layout = route.isShowHeader ? DefaultComponent : React.Fragment
+            return (
+              < Route key={route.path} path={isCheckAuth ? route.path : undefined} element={
+                <Layout>
+                  <Page />
+                </Layout>
+              } />
+            )
+          })}
+        </Routes>
+      </Router>
+      {/* </Loading> */}
     </div>
   )
 }
