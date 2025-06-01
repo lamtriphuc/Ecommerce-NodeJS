@@ -39,26 +39,30 @@ const createProduct = (newProduct) => {
 const updateProduct = (id, data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const checkProduct = Product.findOne({
+            const { name } = data
+
+            const checkProduct = await Product.findOne({
                 _id: id
             })
-            const checkProductName = Product.findOne({
+
+            if (!checkProduct) {
+                resolve({
+                    status: 'ERR',
+                    message: 'Product not found'
+                })
+            }
+
+            const checkProductName = await Product.findOne({
                 name: name,
                 _id: { $ne: id }
             })
             if (checkProductName) {
                 return resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'Product name already exists'
                 })
             }
 
-            if (checkProduct === null) {
-                resolve({
-                    status: 'OK',
-                    message: 'Product is not defined'
-                })
-            }
             const updatedProduct = await Product.findByIdAndUpdate(id, data, { new: true })
             resolve({
                 status: 'OK',
@@ -81,8 +85,8 @@ const deleteProduct = (id) => {
 
             if (checkProduct === null) {
                 resolve({
-                    status: 'OK',
-                    message: 'The product is not defined'
+                    status: 'ERR',
+                    message: 'The product not found'
                 })
             }
 
@@ -153,13 +157,13 @@ const getDetailsProduct = (id) => {
             if (product === null) {
                 resolve({
                     status: 'OK',
-                    message: 'The product is not defined'
+                    message: 'The product not found'
                 })
             }
 
             resolve({
                 status: 'OK',
-                message: 'Get user Success',
+                message: 'Get product Success',
                 data: product
             })
         } catch (error) {
