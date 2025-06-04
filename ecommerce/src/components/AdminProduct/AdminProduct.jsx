@@ -88,6 +88,21 @@ const AdminProduct = () => {
         }
     )
 
+    const mutationDeleteMany = useMutationHooks(
+        (data) => {
+            const { token, ...ids } = data
+            return ProductService.deleteManyProduct(ids, token)
+        }
+    )
+
+    const handelDeleteManyProducts = (ids) => {
+        mutationDeleteMany.mutate({ ids: ids, token: user?.access_token }, {
+            onSettled: () => {
+                queryProduct.refetch()
+            }
+        })
+    }
+
     const getAllProduct = async () => {
         const res = await ProductService.getAllProduct()
         return res
@@ -110,15 +125,16 @@ const AdminProduct = () => {
     }
 
     useEffect(() => {
-        if (rowSelected) {
+        if (rowSelected && isOpenDrawer) {
             setIsLoadingUpdate(true)
             fetchGetDetailsProduct(rowSelected)
         }
-    }, [rowSelected])
+    }, [rowSelected, isOpenDrawer])
 
     const { data, isPending, isSuccess, isError } = mutation
     const { data: dataUpdated, isPending: isPendingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
     const { data: dataDeleted, isPending: isPendingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete
+    const { data: dataDeletedMany, isPending: isPendingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany
 
     const queryProduct = useQuery({
         queryKey: ['products'],
@@ -344,6 +360,19 @@ const AdminProduct = () => {
         }
     }, [isSuccessDeleted, isErrorDeleted])
 
+    useEffect(() => {
+        if (isSuccessDeletedMany) {
+            if (dataDeletedMany?.status === 'OK') {
+                message.success('Xóa sản phẩm thành công')
+            } else {
+                message.error(`Lỗi khi xóa sản phẩm. Chi tiết: ${dataDeletedMany?.message}`)
+            }
+        }
+        if (isErrorDeletedMany) {
+            message.error('Lỗi khi cập nhật sản phẩm')
+        }
+    }, [isSuccessDeletedMany, isErrorDeletedMany])
+
     const handleCancel = () => {
         setIsModalOpen(false)
         form.resetFields()
@@ -435,6 +464,7 @@ const AdminProduct = () => {
             </div>
             <div style={{ marginTop: '10px' }}>
                 <TableComponent
+                    handelDeleteMany={handelDeleteManyProducts}
                     columns={columns}
                     data={dataTable}
                     isLoading={isLoadingProducts} onRow={(record, rowIndex) => {
@@ -447,6 +477,7 @@ const AdminProduct = () => {
                 />
             </div>
             <ModalComponent
+                forceRender
                 title="Thêm sản phẩm"
                 open={isModalOpen}
                 onCancel={handleCancel}
@@ -665,7 +696,7 @@ const AdminProduct = () => {
                     </Form>
                 </Loading>
             </DrawerComponent>
-            <ModalComponent
+            <ModalComponent forceRender
                 title="Xóa sản phẩm"
                 open={isModalOpenDelete}
                 onCancel={handleCancelDelete}

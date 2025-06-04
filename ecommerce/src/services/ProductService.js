@@ -1,8 +1,13 @@
 import axios from "axios"
 export const axiosJWT = axios.create()
 
-export const getAllProduct = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+export const getAllProduct = async (search) => {
+    let res = {}
+    if (search.length > 0) {
+        res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all?filter=name&filter=${search}`)
+    } else {
+        res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+    }
     return res.data
 }
 
@@ -27,6 +32,15 @@ export const updateProduct = async (id, data, access_token) => {
 
 export const deleteProduct = async (id, access_token) => {
     const res = await axiosJWT.delete(`${process.env.REACT_APP_API_URL}/product/delete/${id}`, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    })
+    return res.data
+}
+
+export const deleteManyProduct = async (data, access_token) => {
+    const res = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/product/delete-many`, data, {
         headers: {
             token: `Bearer ${access_token}`
         }

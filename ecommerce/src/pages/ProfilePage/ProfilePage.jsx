@@ -34,7 +34,6 @@ const ProfilePage = () => {
         setPhone(user?.phone)
         setAddress(user?.address)
         setAvatar(user?.avatar)
-        console.log(mutation)
     }, [user])
 
     const handleGetDetailsUser = async (id, token) => {
