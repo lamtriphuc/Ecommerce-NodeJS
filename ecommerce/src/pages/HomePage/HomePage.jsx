@@ -15,49 +15,44 @@ import { useDebounce } from '../../hooks/useDebounce'
 
 const HomePage = () => {
     const arr = ['TV', 'Tủ lạnh', 'Laptop']
-    const refSearch = useRef()
-    const [stateProducts, setStateProducts] = useState([])
+    const [limit, setLimit] = useState(6)
     const [isLoading, setIsLoading] = useState(false)
+    const [typeProducts, setTypeProducts] = useState([])
     const searchProduct = useSelector(state => state?.product?.search)
     const searchDebounce = useDebounce(searchProduct, 1000)
 
-    const fetchProductAll = async (search) => {
-        const res = await ProductService.getAllProduct(search)
-        if (search?.length > 0 || refSearch.current) {
-            setStateProducts(res?.data)
-        } else {
-            return res
+    const fetchProductAll = async ({ queryKey }) => {
+        const [, limit, search] = queryKey
+        const res = await ProductService.getAllProduct(search, limit)
+        return res
+    }
+
+    const fetchAllTypeProduct = async () => {
+        const res = await ProductService.getAllTypeProduct()
+        if (res?.status === 'OK') {
+            setTypeProducts(res?.data)
         }
     }
 
-    useEffect(() => {
-        if (refSearch.current) {
-            setIsLoading(true)
-            fetchProductAll(searchDebounce)
-        }
-        refSearch.current = true
-        setIsLoading(false)
-    }, [searchDebounce])
-
-    const { isPending, data: products } = useQuery({
-        queryKey: ['products'],
+    const { isPending, data: products, isPreviousData } = useQuery({
+        queryKey: ['products', limit, searchDebounce],
         queryFn: fetchProductAll,
-        retry: 3,
-        retryDelay: 1000,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        keepPreviousData: true,
     })
 
+    const currentPage = Math.ceil(limit / 6)
+    const isLoadMoreDisabled = currentPage >= products?.totalPage
+
     useEffect(() => {
-        if (products?.data?.length > 0) {
-            setStateProducts(products?.data)
-        }
-    }, [products])
+        fetchAllTypeProduct()
+    }, [])
 
     return (
-        <Loading isLoading={isPending || isLoading}>
+        <>
             <div style={{ width: '1270px', margin: '0 auto' }}>
                 <WrapperTypeProduct>
-                    {arr.map((item) => {
+                    {typeProducts.map((item) => {
                         return (
                             <TypeProduct name={item} key={item} />
                         )
@@ -67,33 +62,47 @@ const HomePage = () => {
             <div className='body' style={{ backgroundColor: '#efefef', width: '100%' }}>
                 <div id='container' style={{ width: '1270px', margin: '0 auto', height: '100%' }}>
                     <SliderComponent arrImages={[slider1, slider2, slider3, slider4]} />
-                    <WrapperProducts>
-                        {stateProducts?.map((product) => {
-                            return (
-                                <CardComponent
-                                    key={product._id}
-                                    countInStock={product.countInStock}
-                                    description={product.description}
-                                    image={product.image}
-                                    name={product.name}
-                                    price={product.price}
-                                    rating={product.rating}
-                                    type={product.type}
-                                    discount={product.discount}
-                                    sold={product.sold}
-                                />
-                            )
-                        })}
-                    </WrapperProducts>
-                    <div style={{ width: '100%', display: 'flex', marginTop: '10px', justifyContent: 'center' }}>
-                        <WrapperButtonMore textButton='Xem thêm' type='outline' styleButton={{
-                            border: '1px solid rgb(11, 116, 229)', color: 'rgb(11, 116, 229)',
-                            width: '240px', height: '38px', borderRadius: '4px', marginBottom: '40px'
-                        }} styleTextButton={{ fontWeight: '500' }} />
-                    </div>
+                    <Loading isLoading={isPending || isLoading}>
+                        <WrapperProducts>
+                            {products?.data?.map((product) => {
+                                return (
+                                    <CardComponent
+                                        key={product._id}
+                                        id={product._id}
+                                        countInStock={product.countInStock}
+                                        description={product.description}
+                                        image={product.image}
+                                        name={product.name}
+                                        price={product.price}
+                                        rating={product.rating}
+                                        type={product.type}
+                                        discount={product.discount}
+                                        sold={product.sold}
+                                    />
+                                )
+                            })}
+                        </WrapperProducts>
+                        <div style={{ width: '100%', display: 'flex', marginTop: '10px', justifyContent: 'center' }}>
+                            <WrapperButtonMore
+                                textButton={isPreviousData ? 'Đang tải thêm...' : 'Xem thêm'}
+                                type='outline'
+                                styleButton={{
+                                    border: '1px solid rgb(11, 116, 229)', color: isLoadMoreDisabled ? '#ccc' : 'rgb(11, 116, 229)',
+                                    width: '240px', height: '38px', borderRadius: '4px', marginBottom: '40px'
+                                }}
+                                disabled={isLoadMoreDisabled}
+                                styleTextButton={{ fontWeight: '500', color: products?.total === products?.data?.length && '#fff' }}
+                                onClick={() => {
+                                    if (!isLoadMoreDisabled) {
+                                        setLimit(prev => prev + 6);
+                                    }
+                                }}
+                            />
+                        </div>
+                    </Loading>
                 </div>
-            </div>
-        </Loading>
+            </div >
+        </>
     )
 }
 

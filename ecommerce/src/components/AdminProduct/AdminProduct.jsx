@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { WrapperHeader, WrapperUploadFile } from './style'
-import { Button, Form, Modal, Space } from 'antd'
+import { Button, Form, Modal, Select, Space } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64 } from '../../utils'
+import { getBase64, renderOptions } from '../../utils'
 import * as ProductService from '../../services/ProductService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../LoadingComponent/Loading'
@@ -15,14 +15,15 @@ import { useSelector } from 'react-redux'
 import ModalComponent from '../ModalComponent/ModalComponent'
 
 const AdminProduct = () => {
-    const [form] = Form.useForm()
-    const queryClient = useQueryClient()
+    const [formCreate] = Form.useForm();  // Dùng cho Modal thêm
+    const [formUpdate] = Form.useForm();
     const user = useSelector((state) => state?.user)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [rowSelected, setRowSelected] = useState('')
     const [isOpenDrawer, setIsOpenDrawer] = useState(false)
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false)
     const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
+    const [typeSelect, setTypeSelect] = useState('')
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -35,7 +36,8 @@ const AdminProduct = () => {
         rating: '',
         type: '',
         countInStock: '',
-        image: ''
+        image: '',
+        newType: ''
     })
     const [stateProductDetails, setStateProductDetails] = useState({
         name: '',
@@ -48,8 +50,8 @@ const AdminProduct = () => {
     })
 
     useEffect(() => {
-        form.setFieldsValue(stateProductDetails)
-    }, [form, stateProductDetails])
+        formUpdate.setFieldsValue(stateProductDetails)
+    }, [formUpdate, stateProductDetails])
 
     const mutation = useMutationHooks(
         (data) => {
@@ -108,6 +110,11 @@ const AdminProduct = () => {
         return res
     }
 
+    const fetchAllTypeProduct = async () => {
+        const res = await ProductService.getAllTypeProduct()
+        return res
+    }
+
     const fetchGetDetailsProduct = async (rowSelected) => {
         const res = await ProductService.getDetailsProduct(rowSelected)
         if (res?.data) {
@@ -131,16 +138,18 @@ const AdminProduct = () => {
         }
     }, [rowSelected, isOpenDrawer])
 
-    const { data, isPending, isSuccess, isError } = mutation
+    const { data, isPending, isSuccess, isError } = mutation // -> tao
     const { data: dataUpdated, isPending: isPendingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
     const { data: dataDeleted, isPending: isPendingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDelete
     const { data: dataDeletedMany, isPending: isPendingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeleteMany
 
     const queryProduct = useQuery({
         queryKey: ['products'],
-        queryFn: getAllProduct,
-        retry: 3,
-        retryDelay: 1000
+        queryFn: getAllProduct
+    })
+    const typeProduct = useQuery({
+        queryKey: ['type-product'],
+        queryFn: fetchAllTypeProduct
     })
     const { isLoading: isLoadingProducts, data: products } = queryProduct
 
@@ -302,8 +311,8 @@ const AdminProduct = () => {
         if (isSuccess) {
             if (data?.status === 'OK') {
                 setIsModalOpen(false)
-                form.resetFields()
-                setStateProductDetails({
+                formCreate.resetFields()
+                setStateProduct({
                     name: '',
                     price: '',
                     description: '',
@@ -326,8 +335,8 @@ const AdminProduct = () => {
         if (isSuccessUpdated) {
             if (dataUpdated?.status === 'OK') {
                 setIsOpenDrawer(false)
-                form.resetFields()
-                setStateProduct({
+                formUpdate.resetFields()
+                setStateProductDetails({
                     name: '',
                     price: '',
                     description: '',
@@ -375,7 +384,7 @@ const AdminProduct = () => {
 
     const handleCancel = () => {
         setIsModalOpen(false)
-        form.resetFields()
+        formCreate.resetFields()
     }
 
     const handleCancelDelete = () => {
@@ -391,7 +400,16 @@ const AdminProduct = () => {
     }
 
     const onFinish = () => {
-        mutation.mutate(stateProduct, {
+        const params = {
+            name: stateProduct.name,
+            price: stateProduct.price,
+            description: stateProduct.description,
+            rating: stateProduct.rating,
+            type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
+            countInStock: stateProduct.countInStock,
+            image: stateProduct.image
+        }
+        mutation.mutate(params, {
             onSettled: () => {
                 queryProduct.refetch()
             }
@@ -447,6 +465,13 @@ const AdminProduct = () => {
         })
     }
 
+    const handleOnChageSelect = (value) => {
+        setStateProduct({
+            ...stateProduct,
+            type: value
+        })
+    }
+
     return (
         <div>
             <WrapperHeader>Quản lý người dùng</WrapperHeader>
@@ -485,7 +510,7 @@ const AdminProduct = () => {
             >
                 <Loading isLoading={isPending}>
                     <Form
-                        form={form}
+                        form={formCreate}
                         name="basic"
                         labelCol={{ span: 6 }}
                         wrapperCol={{ span: 18 }}
@@ -511,12 +536,28 @@ const AdminProduct = () => {
                             name="type"
                             rules={[{ required: true, message: 'Hãy nhập loại sản phẩm!' }]}
                         >
-                            <InputComponent
-                                value={stateProduct.type}
-                                onChange={handleOnChage}
+                            <Select
                                 name='type'
+                                // defaultValue="lucy"
+                                // style={{ width: 120 }}
+                                value={stateProduct.type}
+                                onChange={handleOnChageSelect}
+                                options={renderOptions(typeProduct?.data?.data)}
                             />
                         </Form.Item>
+                        {stateProduct.type === 'add_type' && (
+                            <Form.Item
+                                label="Loại mới"
+                                name="newType"
+                                rules={[{ required: true, message: 'Hãy nhập loại sản phẩm!' }]}
+                            >
+                                <InputComponent
+                                    name='newType'
+                                    value={stateProduct.newType}
+                                    onChange={handleOnChage}
+                                />
+                            </Form.Item>
+                        )}
 
                         <Form.Item
                             label="Tồn kho"
@@ -593,7 +634,7 @@ const AdminProduct = () => {
             <DrawerComponent title='Chi tiết sản phẩm' isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width='50%'>
                 <Loading isLoading={isLoadingUpdate || isPendingUpdated}>
                     <Form
-                        form={form}
+                        form={formUpdate}
                         name="basic"
                         labelCol={{ span: 4 }}
                         wrapperCol={{ span: 20 }}

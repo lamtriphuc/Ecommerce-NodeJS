@@ -19,8 +19,6 @@ const TableComponent = (props) => {
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setRowSelectedKeys(selectedRowKeys)
-            console.log('rowSelectedKeys', rowSelectedKeys)
-            console.log("selectedRowKeys", selectedRowKeys)
         }
     };
 
@@ -38,9 +36,6 @@ const TableComponent = (props) => {
             })
             .saveAs("Excel.xlsx");
     };
-
-    console.log('dataSource', dataSource)
-    console.log('newColumnExport', newColumnExport)
 
     return (
         <div>

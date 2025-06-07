@@ -24,3 +24,21 @@ export const getItem = (label, key, icon, children, type) => {
         type,
     };
 }
+
+export const renderOptions = (arr) => {
+    let results = []
+    if (arr) {
+        results = arr.map((option) => {
+            return {
+                value: option,
+                label: option
+            }
+        })
+    }
+    results.push({
+        value: 'add_type',
+        label: 'Thêm loại sản phẩm mới'
+    })
+
+    return results
+}
