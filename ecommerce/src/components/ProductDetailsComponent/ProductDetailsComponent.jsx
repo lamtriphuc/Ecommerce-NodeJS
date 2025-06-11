@@ -10,20 +10,22 @@ import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '../LoadingComponent/Loading'
 import { Rate } from "antd";
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { addOrderProduct } from '../../redux/slides/orderSlide'
 
 const ProductDetailsComponent = ({ productId }) => {
     const [numProduct, setNumProduct] = useState(1)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const dispatch = useDispatch()
 
     const user = useSelector(state => state.user)
-    console.log('user', user)
 
     const onChange = (value) => {
         setNumProduct(Number(value))
         console.log('num', numProduct)
     }
-
-
 
     const fetchGetDetailsProduct = async ({ queryKey }) => {
         const [, id] = queryKey
@@ -47,6 +49,22 @@ const ProductDetailsComponent = ({ productId }) => {
             if (numProduct === 1)
                 return
             setNumProduct(numProduct - 1)
+        }
+    }
+
+    const handleAddOrderProduct = () => {
+        if (!user?._id) {
+            navigate('/sign-in', { state: location?.pathname })
+        } else {
+            dispatch(addOrderProduct({
+                orderItem: {
+                    name: productDetails?.name,
+                    amount: numProduct,
+                    image: productDetails?.image,
+                    price: productDetails?.price,
+                    product: productDetails?._id
+                }
+            }))
         }
     }
 
@@ -79,7 +97,7 @@ const ProductDetailsComponent = ({ productId }) => {
                 <Col span={14} style={{ paddingLeft: '10px' }}>
                     <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
                     <div>
-                        <Rate allowHalf defaultValue={productDetails?.rating} />
+                        <Rate disabled value={productDetails?.rating} />
                         <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
                     </div>
                     <WrapperPriceProduct>
@@ -106,25 +124,26 @@ const ProductDetailsComponent = ({ productId }) => {
                         <ButtonComponent
                             size={40}
                             styleButton={{
-                                backgroundColor: 'rgb(255, 66, 78)',
+                                background: 'rgb(255, 66, 78)',
                                 borderRadius: '2px',
                                 border: 'none',
                                 width: '220px',
                                 height: '48px',
                             }}
+                            onClick={handleAddOrderProduct}
                             textButton={'Mua ngay'}
                             styleTextButton={{ color: '#fff' }}
                         ></ButtonComponent>
                         <ButtonComponent
                             size={40}
                             styleButton={{
-                                backgroundColor: '#fff',
+                                background: '#fff',
                                 borderRadius: '2px',
                                 border: '1px solid rgb(10, 104, 255)',
                                 width: '220px',
                                 height: '48px',
                             }}
-                            textButton={'Mua ngay'}
+                            textButton={'Thêm vào giỏ'}
                             styleTextButton={{ color: 'rgb(10, 104, 255)' }}
                         ></ButtonComponent>
                     </div>

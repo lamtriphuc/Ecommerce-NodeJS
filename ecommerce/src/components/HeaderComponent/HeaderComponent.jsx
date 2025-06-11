@@ -22,6 +22,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     const [userName, setUserName] = useState('')
     const [userAvatar, setUserAvatar] = useState('')
     const [search, setSearch] = useState('')
+    const order = useSelector(state => state.order)
 
     const handleNavigateLogin = () => {
         navigate('/sign-in')
@@ -62,7 +63,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
         <div style={{ width: '100%', background: 'rgb(26, 148, 255)', display: 'flex', justifyContent: 'center' }}>
             <WapperHeader style={{ justifyContent: isHiddenSearch && isHiddenCart ? 'space-between' : 'unset' }}>
                 <Col span={5}>
-                    <WrapperTextHeader>LAMTRIPHUC</WrapperTextHeader>
+                    <WrapperTextHeader onClick={() => navigate('/')}>LAMTRIPHUC</WrapperTextHeader>
                 </Col>
                 {!isHiddenSearch && (
                     <Col span={13}>
@@ -104,8 +105,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                         </WrapperHeaderAccount>
                     </Loading>
                     {!isHiddenCart && (
-                        <div>
-                            <Badge count={4} size='small'>
+                        <div onClick={() => navigate('/order')} style={{ cursor: 'pointer' }} >
+                            <Badge count={order?.orderItems?.length} size='small'>
                                 <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                             </Badge>
                             <WrapperTextHeaderSmall>Giỏ hàng</WrapperTextHeaderSmall>

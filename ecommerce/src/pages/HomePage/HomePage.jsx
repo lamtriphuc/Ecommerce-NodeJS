@@ -14,12 +14,11 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
 
 const HomePage = () => {
-    const arr = ['TV', 'Tủ lạnh', 'Laptop']
     const [limit, setLimit] = useState(6)
     const [isLoading, setIsLoading] = useState(false)
     const [typeProducts, setTypeProducts] = useState([])
     const searchProduct = useSelector(state => state?.product?.search)
-    const searchDebounce = useDebounce(searchProduct, 1000)
+    const searchDebounce = useDebounce(searchProduct, 500)
 
     const fetchProductAll = async ({ queryKey }) => {
         const [, limit, search] = queryKey

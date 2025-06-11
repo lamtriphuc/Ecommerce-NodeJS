@@ -5,7 +5,7 @@ import InputForm from '../../components/InputForm/InputForm'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import logoLogin from '../../assets/images/logo-login.png'
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import * as UserService from '../../services/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/Loading'
@@ -16,6 +16,7 @@ import { updateUser } from '../../redux/slides/userSlide'
 const SignInPage = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const location = useLocation()
 
     const mutation = useMutationHooks(
         data => UserService.loginUser(data)
@@ -25,7 +26,11 @@ const SignInPage = () => {
 
     useEffect(() => {
         if (isSuccess && data?.status === 'OK') {
-            navigate('/')
+            if (location?.state) {
+                navigate(location?.state)
+            } else {
+                navigate('/')
+            }
             localStorage.setItem('access_token', JSON.stringify(data?.access_token))
             if (data?.access_token) {
                 const decoded = jwtDecode(data?.access_token);
