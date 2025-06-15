@@ -2,7 +2,7 @@ const Product = require('../models/ProductModel');
 
 const createProduct = (newProduct) => {
     return new Promise(async (resolve, reject) => {
-        const { name, image, type, countInStock, price, rating, description } = newProduct
+        const { name, image, type, countInStock, price, rating, description, discount } = newProduct
         try {
 
             const checkProduct = await Product.findOne({
@@ -21,7 +21,8 @@ const createProduct = (newProduct) => {
                 countInStock,
                 price,
                 rating,
-                description
+                description,
+                discount
             });
             if (createdProduct) {
                 resolve({
@@ -120,6 +121,7 @@ const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments()
+            let allProduct = []
             if (filter) {
                 const label = filter[0]
                 const allObjectFilter = await Product.find({ [label]: { '$regex': filter[1], $options: 'i' } })
@@ -146,7 +148,11 @@ const getAllProduct = (limit, page, sort, filter) => {
                     totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            const allProduct = await Product.find().limit(limit).skip(limit * page)
+            if (!limit) {
+                allProduct = await Product.find()
+            } else {
+                allProduct = await Product.find().limit(limit).skip(limit * page)
+            }
             resolve({
                 status: 'OK',
                 message: 'Get all product',

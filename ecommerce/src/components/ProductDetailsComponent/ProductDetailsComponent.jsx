@@ -13,6 +13,7 @@ import { Rate } from "antd";
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { addOrderProduct } from '../../redux/slides/orderSlide'
+import { convertPrice } from '../../utils'
 
 const ProductDetailsComponent = ({ productId }) => {
     const [numProduct, setNumProduct] = useState(1)
@@ -24,7 +25,6 @@ const ProductDetailsComponent = ({ productId }) => {
 
     const onChange = (value) => {
         setNumProduct(Number(value))
-        console.log('num', numProduct)
     }
 
     const fetchGetDetailsProduct = async ({ queryKey }) => {
@@ -101,7 +101,7 @@ const ProductDetailsComponent = ({ productId }) => {
                         <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
                     </div>
                     <WrapperPriceProduct>
-                        <WrapperPriceTextProduct>{productDetails?.price.toLocaleString()}đ</WrapperPriceTextProduct>
+                        <WrapperPriceTextProduct>{convertPrice(productDetails?.price)}đ</WrapperPriceTextProduct>
                     </WrapperPriceProduct>
                     <WrapperAddressProduct>
                         <span>Giao đến </span>

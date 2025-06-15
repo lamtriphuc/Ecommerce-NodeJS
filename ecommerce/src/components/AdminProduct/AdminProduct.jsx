@@ -37,7 +37,8 @@ const AdminProduct = () => {
         type: '',
         countInStock: '',
         image: '',
-        newType: ''
+        newType: '',
+        discount: ''
     })
     const [stateProductDetails, setStateProductDetails] = useState({
         name: '',
@@ -46,7 +47,8 @@ const AdminProduct = () => {
         rating: '',
         type: '',
         countInStock: '',
-        image: ''
+        image: '',
+        discount: ''
     })
 
     useEffect(() => {
@@ -62,7 +64,8 @@ const AdminProduct = () => {
                 rating,
                 type,
                 countInStock,
-                image
+                image,
+                discount
             } = data
             return ProductService.createProduct({
                 name,
@@ -71,7 +74,8 @@ const AdminProduct = () => {
                 rating,
                 type,
                 countInStock,
-                image
+                image,
+                discount
             })
         }
     )
@@ -125,7 +129,8 @@ const AdminProduct = () => {
                 rating: res?.data?.rating,
                 type: res?.data?.type,
                 countInStock: res?.data?.countInStock,
-                image: res?.data?.image
+                image: res?.data?.image,
+                discount: res?.data?.discount
             })
         }
         setIsLoadingUpdate(false)
@@ -319,7 +324,8 @@ const AdminProduct = () => {
                     rating: '',
                     type: '',
                     countInStock: '',
-                    image: ''
+                    image: '',
+                    discount: ''
                 })
                 message.success('Thêm sản phẩm mới thành công')
             } else {
@@ -343,7 +349,8 @@ const AdminProduct = () => {
                     rating: '',
                     type: '',
                     countInStock: '',
-                    image: ''
+                    image: '',
+                    discount: ''
                 })
                 message.success('Cập nhật sản phẩm thành công')
             } else {
@@ -407,7 +414,8 @@ const AdminProduct = () => {
             rating: stateProduct.rating,
             type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
             countInStock: stateProduct.countInStock,
-            image: stateProduct.image
+            image: stateProduct.image,
+            discount: stateProduct.discount
         }
         mutation.mutate(params, {
             onSettled: () => {
@@ -604,6 +612,17 @@ const AdminProduct = () => {
                             />
                         </Form.Item>
                         <Form.Item
+                            label="Giảm giá"
+                            name="discount"
+                            rules={[{ required: true, message: 'Hãy nhập giảm giá cho sản phẩm!' }]}
+                        >
+                            <InputComponent
+                                value={stateProduct.discount}
+                                onChange={handleOnChage}
+                                name='discount'
+                            />
+                        </Form.Item>
+                        <Form.Item
                             label="Ảnh"
                             name="image"
                             rules={[{ required: true, message: 'Hãy nhập ảnh sản phẩm!' }]}
@@ -708,6 +727,17 @@ const AdminProduct = () => {
                                 value={stateProductDetails.rating}
                                 onChange={handleOnChageDetails}
                                 name='rating'
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            label="Giảm giá"
+                            name="discount"
+                            rules={[{ required: true, message: 'Hãy nhập giảm giá của sản phẩm!' }]}
+                        >
+                            <InputComponent
+                                value={stateProductDetails.discount}
+                                onChange={handleOnChageDetails}
+                                name='discount'
                             />
                         </Form.Item>
                         <Form.Item

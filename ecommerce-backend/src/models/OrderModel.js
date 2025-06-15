@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { use } = require('react');
 const orderSchema = new mongoose.Schema({
     orderItems: [
         {
@@ -18,13 +17,14 @@ const orderSchema = new mongoose.Schema({
         fullName: { type: String, required: true },
         address: { type: String, required: true },
         city: { type: String, required: true },
-        country: { type: String, required: true },
+        country: { type: String },
         phone: { type: Number, required: true },
     },
     paymentMethod: { type: String, required: true },
+    shippingMethod: { type: String, required: true },
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
-    TaxPrice: { type: Number, required: true },
+    discountPrice: { type: Number },
     totalPrice: { type: Number, required: true },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,3 +37,6 @@ const orderSchema = new mongoose.Schema({
     deliveredAt: { type: Date },
 }
 );
+
+const Order = mongoose.model('Order', orderSchema);
+module.exports = Order;

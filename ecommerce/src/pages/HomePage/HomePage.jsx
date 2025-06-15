@@ -14,7 +14,7 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
 
 const HomePage = () => {
-    const [limit, setLimit] = useState(6)
+    const [limit, setLimit] = useState(12)
     const [isLoading, setIsLoading] = useState(false)
     const [typeProducts, setTypeProducts] = useState([])
     const searchProduct = useSelector(state => state?.product?.search)
@@ -40,7 +40,7 @@ const HomePage = () => {
         keepPreviousData: true,
     })
 
-    const currentPage = Math.ceil(limit / 6)
+    const currentPage = Math.ceil(limit / 12)
     const isLoadMoreDisabled = currentPage >= products?.totalPage
 
     useEffect(() => {

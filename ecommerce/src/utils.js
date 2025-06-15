@@ -69,3 +69,13 @@ export const toSlug = (str) => {
 
     return str;
 }
+
+
+export const convertPrice = (price) => {
+    try {
+        const result = price.toLocaleString().replaceAll(',', '.')
+        return `${result} VNĐ`
+    } catch (error) {
+        return null
+    }
+}

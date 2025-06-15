@@ -75,26 +75,32 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                         />
                     </Col>
                 )}
-                <Col span={6} style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                <Col span={6} style={{ display: 'flex', gap: '20px', alignItems: 'center', justifyContent: isHiddenSearch && isHiddenCart ? 'flex-end' : 'unset', }}>
                     <Loading isLoading={loading}>
-                        <WrapperHeaderAccount>
-                            {userAvatar ? (
-                                <img src={userAvatar} alt="avatar" style={{
-                                    height: '30px',
-                                    width: '30px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover'
-                                }} />
-                            ) : (
-                                <UserOutlined style={{ fontSize: '30px' }} />
-                            )}
+                        <WrapperHeaderAccount
+                            onClick={() => {
+                                if (user?.access_token) return;
+                                handleNavigateLogin()
+                            }}
+                        >
                             {user?.access_token ? (
-                                <>
-                                    <Popover placement="bottom" content={content} trigger='click'>
-                                        <div style={{ cursor: 'pointer' }}>{user?.name || 'User'}</div>
-                                    </Popover></>
+                                <Popover placement="bottom" content={content} trigger='click'>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        {userAvatar ? (
+                                            <img src={userAvatar} alt="avatar" style={{
+                                                height: '30px',
+                                                width: '30px',
+                                                borderRadius: '50%',
+                                                objectFit: 'cover'
+                                            }} />
+                                        ) : (
+                                            <UserOutlined style={{ fontSize: '30px' }} />
+                                        )}
+                                        {user?.name || 'User'}
+                                    </div>
+                                </Popover>
                             ) : (
-                                <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
+                                <div>
                                     <WrapperTextHeaderSmall>Đăng nhập/Đăng ký</WrapperTextHeaderSmall>
                                     <div>
                                         <WrapperTextHeaderSmall>Tài khoản </WrapperTextHeaderSmall>
