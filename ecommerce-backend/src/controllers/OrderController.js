@@ -1,7 +1,6 @@
 const OrderService = require('../services/OrderService')
 
 const createOrder = async (req, res) => {
-    console.log('req-controller', req.body)
     try {
         const { shippingMethod, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone } = req.body
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { WrapperCountOrder, WrapperInfo, WrapperInputNumber, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperPriceDiscount, WrapperRight, WrapperStyleHeader, WrapperTotal } from './style'
+import { WrapperCountOrder, WrapperInfo, WrapperInputNumber, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperPriceDiscount, WrapperRight, WrapperStyleHeader, WrapperStyleHeaderDelivery, WrapperTotal } from './style'
 import { Button, Checkbox, Form } from 'antd'
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import image from '../../assets/images/test.webp'
@@ -15,6 +15,7 @@ import * as UserService from '../../services/UserService'
 import * as message from '../../components/Message/MessageComponent'
 import { updateUser } from '../../redux/slides/userSlide'
 import { useNavigate } from 'react-router-dom'
+import StepComponent from '../../components/StepComponent/StepComponent'
 
 const OrderPage = () => {
     const order = useSelector(state => state.order)
@@ -116,9 +117,9 @@ const OrderPage = () => {
     }, [order])
 
     const deliveryPriceMemo = useMemo(() => {
-        if (priceMemo > 100000) {
+        if (priceMemo >= 200000 && priceMemo < 500000) {
             return 10000
-        } else if (priceMemo === 0) {
+        } else if (priceMemo === 0 || priceMemo >= 500000) {
             return 0
         } else {
             return 20000
@@ -181,12 +182,35 @@ const OrderPage = () => {
         navigate(`/product-details/${id}`)
     }
 
+    const itemsDelivery = [
+        {
+            title: '20.000 VNĐ',
+            description: 'Dưới 200.000 VNĐ',
+        },
+        {
+            title: '10.000 VNĐ',
+            description: 'Từ 200.000 VNĐ đến dưới 500.000 VNĐ',
+        },
+        {
+            title: '0 VNĐ',
+            description: 'Từ 500.000 VNĐ',
+        },
+    ]
+
     return (
         <div style={{ background: '#f5f5fa', width: '100%', height: '100vh' }}>
             <div style={{ height: '100%', width: '1270px', margin: '0 auto' }} >
                 <h3 style={{ margin: 0, padding: '20px 0' }}>Giỏ hàng</h3>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }} >
                     <WrapperLeft>
+                        <WrapperStyleHeaderDelivery>
+                            <StepComponent items={itemsDelivery} current={
+                                !order?.orderItemsSelected.length ? -1
+                                    : deliveryPriceMemo === 20000 ? 0
+                                        : deliveryPriceMemo === 10000 ? 1
+                                            : 2
+                            } />
+                        </WrapperStyleHeaderDelivery>
                         <WrapperStyleHeader>
                             <span style={{ display: 'inline-block', width: '390px' }}>
                                 <Checkbox onChange={handleOnChangeCheckAll} checked={checkedList.length === order?.orderItems?.length}></Checkbox>

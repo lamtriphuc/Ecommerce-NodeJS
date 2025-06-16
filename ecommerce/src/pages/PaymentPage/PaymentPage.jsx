@@ -53,7 +53,20 @@ const PaymentPage = () => {
     useEffect(() => {
         if (!isPending && data) {
             if (data.status === 'OK') {
+                const arrayOrder = []
+                order?.orderItemsSelected?.forEach(element => {
+                    arrayOrder.push(element.product)
+                })
+                dispatch(removeAllOrderProduct({ checkedList: arrayOrder }))
                 message.success('Đặt hàng thành công!');
+                navigate('/order-success', {
+                    state: {
+                        delivery,
+                        payment,
+                        orders: order?.orderItemsSelected,
+                        totalPrice: totalPriceMemo
+                    }
+                })
             } else {
                 message.error('Đặt hàng thất bại!');
             }
@@ -179,7 +192,7 @@ const PaymentPage = () => {
             <Loading isLoading={isPending}>
                 <div style={{ height: '100%', width: '1270px', margin: '0 auto' }} >
                     <h3>Thanh toán</h3>
-                    <div style={{ display: 'flex', justifyContent: 'center' }} >
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }} >
                         <WrapperLeft>
                             <WrapperInfo>
                                 <div>
