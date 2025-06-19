@@ -41,12 +41,36 @@ const ProfilePage = () => {
         dispatch(updateUser({ ...res?.data, access_token: token }))
     }
 
+    // const handleOnChangeAvatar = async ({ fileList }) => {
+    //     const file = fileList[0]
+    //     if (!file.url && !file.preview) {
+    //         file.preview = await getBase64(file.originFileObj);
+    //     }
+    //     setAvatar(file.preview)
+    // }
     const handleOnChangeAvatar = async ({ fileList }) => {
-        const file = fileList[0]
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
+        const file = fileList[0]?.originFileObj;
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'upload-image');
+
+        try {
+            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.secure_url) {
+                setAvatar(data.secure_url)
+            } else {
+                console.error('Upload lỗi:', data);
+            }
+        } catch (err) {
+            console.error('Lỗi upload Cloudinary:', err);
         }
-        setAvatar(file.preview)
     }
 
     const handelUpdate = () => {

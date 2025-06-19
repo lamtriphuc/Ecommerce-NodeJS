@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Col, Row } from 'antd'
 import productImage from '../../assets/images/test.webp'
 import productImageSmall from '../../assets/images/imagesmall.webp'
-import { WrapperAddressProduct, WrapperInputNumber, WrapperPriceProduct, WrapperPriceTextProduct, WrapperQuantityProduct, WrapperStyleColSmall, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStyleTextSell } from './style'
+import { WrapperAddressProduct, WrapperDiscountText, WrapperInputNumber, WrapperPriceProduct, WrapperPriceTextProduct, WrapperQuantityProduct, WrapperStyleColSmall, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStyleTextSell } from './style'
 import { StarFilled, PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import * as ProductService from '../../services/ProductService'
@@ -62,11 +62,13 @@ const ProductDetailsComponent = ({ productId }) => {
                     amount: numProduct,
                     image: productDetails?.image,
                     price: productDetails?.price,
-                    product: productDetails?._id
+                    product: productDetails?._id,
+                    discount: productDetails?.discount
                 }
             }))
         }
     }
+
 
     return (
         <Loading isLoading={isPending}>
@@ -98,10 +100,11 @@ const ProductDetailsComponent = ({ productId }) => {
                     <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
                     <div>
                         <Rate disabled value={productDetails?.rating} />
-                        <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
+                        <WrapperStyleTextSell> | Đã bán {productDetails?.sold}+</WrapperStyleTextSell>
                     </div>
                     <WrapperPriceProduct>
-                        <WrapperPriceTextProduct>{convertPrice(productDetails?.price)}đ</WrapperPriceTextProduct>
+                        <WrapperPriceTextProduct>{convertPrice(productDetails?.price)}</WrapperPriceTextProduct>
+                        <WrapperDiscountText>-{productDetails?.discount}%</WrapperDiscountText>
                     </WrapperPriceProduct>
                     <WrapperAddressProduct>
                         <span>Giao đến </span>
@@ -124,9 +127,9 @@ const ProductDetailsComponent = ({ productId }) => {
                         <ButtonComponent
                             size={40}
                             styleButton={{
-                                background: 'rgb(255, 66, 78)',
+                                background: '#fff',
                                 borderRadius: '2px',
-                                border: 'none',
+                                border: '1px solid rgb(10, 104, 255)',
                                 width: '220px',
                                 height: '48px',
                             }}
@@ -137,9 +140,9 @@ const ProductDetailsComponent = ({ productId }) => {
                         <ButtonComponent
                             size={40}
                             styleButton={{
-                                background: '#fff',
+                                background: 'rgb(255, 66, 78)',
                                 borderRadius: '2px',
-                                border: '1px solid rgb(10, 104, 255)',
+                                border: 'none',
                                 width: '220px',
                                 height: '48px',
                             }}

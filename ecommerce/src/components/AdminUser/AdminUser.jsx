@@ -332,18 +332,47 @@ const AdminUser = () => {
         })
     }
 
-    const handleOnChangeAvatar = async ({ fileList }) => {
-        const file = fileList[0]
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-        const newAvatar = file.preview
-        setStateUserDetails({
-            ...stateUserDetails,
-            avatar: newAvatar
-        })
+    // const handleOnChangeAvatar = async ({ fileList }) => {
+    //     const file = fileList[0]
+    //     if (!file.url && !file.preview) {
+    //         file.preview = await getBase64(file.originFileObj);
+    //     }
+    //     const newAvatar = file.preview
+    //     setStateUserDetails({
+    //         ...stateUserDetails,
+    //         avatar: newAvatar
+    //     })
 
-        dispatch(updateUser({ ...user, avatar: newAvatar }))
+    //     dispatch(updateUser({ ...user, avatar: newAvatar }))
+    // }
+
+    const handleOnChangeAvatar = async ({ fileList }) => {
+        const file = fileList[0]?.originFileObj;
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'upload-image');
+
+        try {
+            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json()
+
+            if (data.secure_url) {
+                setStateUserDetails({
+                    ...stateUserDetails,
+                    avatar: data.secure_url
+                })
+                dispatch(updateUser({ ...user, avatar: data.secure_url }))
+            } else {
+                console.error('Upload lỗi:', data);
+            }
+        } catch (err) {
+            console.error('Lỗi upload Cloudinary:', err);
+        }
     }
 
     const onUpdateUser = () => {
@@ -391,7 +420,7 @@ const AdminUser = () => {
                         <Form.Item
                             label="Tên"
                             name="name"
-                            rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+                            rules={[{ required: true, message: 'Hãy nhập tên!' }]}
                         >
                             <InputComponent
                                 name='name'
@@ -448,7 +477,6 @@ const AdminUser = () => {
                         <Form.Item
                             label="Avatar"
                             name="avatar"
-                            rules={[{ message: 'Hãy nhập ảnh sản phẩm!' }]}
                         >
                             <WrapperUploadFile style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onChange={handleOnChangeAvatar} maxCount={1} beforeUpload={() => false} >
                                 <Button>Upload</Button>

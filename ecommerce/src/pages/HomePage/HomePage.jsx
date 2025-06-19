@@ -86,7 +86,7 @@ const HomePage = () => {
                                 textButton={isPreviousData ? 'Đang tải thêm...' : 'Xem thêm'}
                                 type='outline'
                                 styleButton={{
-                                    border: '1px solid rgb(11, 116, 229)', color: isLoadMoreDisabled ? '#ccc' : 'rgb(11, 116, 229)',
+                                    border: !isLoadMoreDisabled ? '1px solid rgb(11, 116, 229)' : '1px solid', color: isLoadMoreDisabled ? '#ccc' : 'rgb(11, 116, 229)',
                                     width: '240px', height: '38px', borderRadius: '4px', marginBottom: '40px'
                                 }}
                                 disabled={isLoadMoreDisabled}

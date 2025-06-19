@@ -28,13 +28,21 @@ export const WrapperStyleTextSell = styled.span`
 export const WrapperPriceProduct = styled.div`
     background: rgb(250, 250, 250);
     border-radius: 4px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
 `
 
 export const WrapperPriceTextProduct = styled.h1`
     color: rgb(255, 66, 78);
     font-size: 32px;
     font-weight: 600;
-    line-height: 150%;
+`
+
+export const WrapperDiscountText = styled.span`
+    font-size: 20px;
+    font-weight: 500;
+    color: rgb(232, 120, 127);
 `
 
 export const WrapperAddressProduct = styled.div`

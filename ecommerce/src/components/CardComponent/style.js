@@ -2,13 +2,22 @@ import { Card } from "antd";
 import styled from "styled-components";
 
 export const WapperCardStyle = styled(Card)`
-    width: 200px;
-    & img {
-        width: 200px;
-        height: 220px;
-    },
+    width: 200px !important;
     position: relative;
     border-radius: 0;
+    border-radius: 8px;
+    .ant-card-body {
+        width: 200px !important;
+        padding: 20px; 
+    }
+    background-color: ${props => props.disabled ? '#ccc' : '#fff'};
+    cursor: ${props => props.disabled ? 'not-allowed' : 'poiter'};
+    .product-image {
+        width: 200px !important;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
 `
 
 export const StyleNameProduct = styled.div`
@@ -40,7 +49,7 @@ export const WrapperPriceText = styled.div`
 `
 
 export const WrapperDiscountText = styled.span`
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
-    color: rgb(255,66,78);
+    color: rgb(232, 120, 127);
 `

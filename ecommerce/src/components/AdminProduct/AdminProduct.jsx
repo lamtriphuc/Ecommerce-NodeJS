@@ -4,7 +4,7 @@ import { Button, Form, Modal, Select, Space } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64, renderOptions } from '../../utils'
+import { convertPrice, getBase64, renderOptions } from '../../utils'
 import * as ProductService from '../../services/ProductService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../LoadingComponent/Loading'
@@ -247,15 +247,16 @@ const AdminProduct = () => {
 
     const columns = [
         {
-            title: 'Name',
+            title: 'Tên sản phẩm',
             dataIndex: 'name',
             sorter: (a, b) => a.name.length - b.name.length,
             ...getColumnSearchProps('name')
         },
         {
-            title: 'Price',
+            title: 'Giá',
             dataIndex: 'price',
             sorter: (a, b) => a.price - b.price,
+            width: '200px',
             filters: [
                 {
                     text: '>= 50',
@@ -271,6 +272,27 @@ const AdminProduct = () => {
                     return record.price >= 50
                 }
                 return record.price <= 50
+            }
+        },
+        {
+            title: 'Tồn kho',
+            dataIndex: 'countInStock',
+            width: '200px',
+            filters: [
+                {
+                    text: '= 0',
+                    value: '==',
+                },
+                {
+                    text: '> 0',
+                    value: '>'
+                }
+            ],
+            onFilter: (value, record) => {
+                if (value === '==') {
+                    return record.countInStock == 0
+                }
+                return record.countInStock > 0
             }
         },
         {
@@ -296,12 +318,12 @@ const AdminProduct = () => {
             width: '80px'
         },
         {
-            title: 'Type',
+            title: 'Loại',
             dataIndex: 'type',
             width: '200px'
         },
         {
-            title: 'Action',
+            title: 'Thao tác',
             dataIndex: 'action',
             render: renderAction,
             width: '120px'
@@ -309,7 +331,11 @@ const AdminProduct = () => {
     ];
 
     const dataTable = products?.data?.length && products?.data?.map((product) => {
-        return { ...product, key: product._id }
+        return {
+            ...product,
+            key: product._id,
+            price: convertPrice(product.price)
+        }
     })
 
     useEffect(() => {
@@ -439,26 +465,71 @@ const AdminProduct = () => {
         })
     }
 
+    // const handleOnChangeImage = async ({ fileList }) => {
+    //     const file = fileList[0]
+    //     if (!file.url && !file.preview) {
+    //         file.preview = await getBase64(file.originFileObj);
+    //     }
+    //     setStateProduct({
+    //         ...stateProduct,
+    //         image: file.preview
+    //     })
+    // }
+
     const handleOnChangeImage = async ({ fileList }) => {
-        const file = fileList[0]
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
+        const file = fileList[0]?.originFileObj;
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'upload-image');
+
+        try {
+            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.secure_url) {
+                setStateProduct({
+                    ...stateProduct,
+                    image: data.secure_url
+                });
+            } else {
+                console.error('Upload lỗi:', data);
+            }
+        } catch (err) {
+            console.error('Lỗi upload Cloudinary:', err);
         }
-        setStateProduct({
-            ...stateProduct,
-            image: file.preview
-        })
     }
 
     const handleOnChangeImageDetails = async ({ fileList }) => {
-        const file = fileList[0]
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
+        const file = fileList[0]?.originFileObj;
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'upload-image');
+
+        try {
+            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.secure_url) {
+                setStateProductDetails({
+                    ...stateProductDetails,
+                    image: data.secure_url
+                });
+            } else {
+                console.error('Upload lỗi:', data);
+            }
+        } catch (err) {
+            console.error('Lỗi upload Cloudinary:', err);
         }
-        setStateProductDetails({
-            ...stateProductDetails,
-            image: file.preview
-        })
     }
 
     const onUpdateProduct = () => {
@@ -546,8 +617,6 @@ const AdminProduct = () => {
                         >
                             <Select
                                 name='type'
-                                // defaultValue="lucy"
-                                // style={{ width: 120 }}
                                 value={stateProduct.type}
                                 onChange={handleOnChageSelect}
                                 options={renderOptions(typeProduct?.data?.data)}
@@ -633,9 +702,7 @@ const AdminProduct = () => {
                                     <img src={stateProduct?.image} alt='product-image' style={{
                                         height: '60px',
                                         width: '60px',
-                                        borderRadius: '50%',
                                         objectFit: 'cover',
-                                        // marginLeft: '20px'
                                     }} />
                                 )}
                             </WrapperUploadFile>
@@ -751,7 +818,6 @@ const AdminProduct = () => {
                                     <img src={stateProductDetails?.image} alt='product-image' style={{
                                         height: '60px',
                                         width: '60px',
-                                        borderRadius: '50%',
                                         objectFit: 'cover',
                                         float: 'right'
                                     }} />

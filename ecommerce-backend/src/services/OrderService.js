@@ -5,7 +5,10 @@ const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
         const { orderItems, shippingMethod, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user } = newOrder
         try {
-            const promises = orderItems.map(async (order) => {
+            // Bước 1: kiểm tra tồn kho và cập nhật sản phẩm
+            const failedItems = [];
+
+            for (const order of orderItems) {
                 const productData = await Product.findOneAndUpdate(
                     {
                         _id: order.product,
@@ -13,58 +16,97 @@ const createOrder = (newOrder) => {
                     },
                     {
                         $inc: {
-                            sold: + order.amount,
-                            countInStock: - order.amount
+                            sold: +order.amount,
+                            countInStock: -order.amount
                         }
                     },
                     { new: true }
-                )
-                console.log('productData', productData)
-                if (productData) {
-                    const createdOrder = await Order.create({
-                        orderItems,
-                        shippingAddress: {
-                            fullName,
-                            address,
-                            phone,
-                            city,
-                        },
-                        paymentMethod,
-                        shippingMethod,
-                        itemsPrice,
-                        shippingPrice,
-                        totalPrice,
-                        user: user
-                    });
-                    if (createdOrder) {
-                        return {
-                            status: 'OK',
-                            message: 'Order created successfully',
-                        }
-                    }
-                } else {
-                    return {
-                        status: 'ERR',
-                        message: 'Not enough countInStock',
-                        id: order.product
-                    }
+                );
+
+                if (!productData) {
+                    failedItems.push(order.product)
                 }
-            })
-            const results = await Promise.all(promises)
-            const newData = results && results.filter(item => item.id)
-            if (newData.length) {
-                const ids = newData.map(item => item.id).join(',')
-                console.log('ids', ids)
-                resolve({
+            }
+            // Nếu có sản phẩm không đủ hàng    
+            if (failedItems.length > 0) {
+                return resolve({
                     status: 'ERR',
-                    message: `Sản phẩm với id: ${ids} không đủ hàng`
+                    message: `Sản phẩm với id: ${failedItems.join(',')} không đủ hàng`
                 })
             }
+
+            // Bước 2: tạo đơn hàng duy nhất nếu tất cả sản phẩm ok
+            const createdOrder = await Order.create({
+                orderItems,
+                shippingAddress: {
+                    fullName,
+                    address,
+                    phone,
+                    city
+                },
+                paymentMethod,
+                shippingMethod,
+                itemsPrice,
+                shippingPrice,
+                totalPrice,
+                user
+            })
+
+            return resolve({
+                status: 'OK',
+                message: 'Order created successfully',
+                data: createdOrder
+            })
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+const getOrderDetails = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const order = await Order.findOne({
+                user: id
+            })
+
+            if (order === null) {
+                resolve({
+                    status: 'OK',
+                    message: 'The product not found'
+                })
+            }
+
             resolve({
                 status: 'OK',
-                message: 'Order created successfully'
+                message: 'Get order Success',
+                data: order
             })
-            console.log('results', results)
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+const getAllOrderByUser = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const order = await Order.find({
+                user: id
+            })
+
+            if (order === null) {
+                resolve({
+                    status: 'OK',
+                    message: 'The product not found'
+                })
+            }
+
+            resolve({
+                status: 'OK',
+                message: 'Get order Success',
+                data: order
+            })
         } catch (error) {
             reject(error);
         }
@@ -73,5 +115,7 @@ const createOrder = (newOrder) => {
 
 
 module.exports = {
-    createOrder
+    createOrder,
+    getOrderDetails,
+    getAllOrderByUser
 }

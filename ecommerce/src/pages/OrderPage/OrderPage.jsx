@@ -108,12 +108,10 @@ const OrderPage = () => {
 
     const priceDiscountMemo = useMemo(() => {
         const result = order?.orderItemsSelected?.reduce((total, cur) => {
-            return total + (cur.price * cur.discount)
+            const discount = cur.discount || 0
+            return total + (cur.price * (discount / 100) * cur.amount)
         }, 0)
-        if (Number(result)) {
-            return result
-        }
-        return 0
+        return Number(result) || 0
     }, [order])
 
     const deliveryPriceMemo = useMemo(() => {
@@ -129,6 +127,7 @@ const OrderPage = () => {
     const totalPriceMemo = useMemo(() => {
         return Number(priceMemo) - Number(priceDiscountMemo) + Number(deliveryPriceMemo)
     }, [priceMemo, priceDiscountMemo, deliveryPriceMemo])
+
 
     const handleAddCart = () => {
         if (!order?.orderItemsSelected?.length) {
@@ -213,7 +212,7 @@ const OrderPage = () => {
                         </WrapperStyleHeaderDelivery>
                         <WrapperStyleHeader>
                             <span style={{ display: 'inline-block', width: '390px' }}>
-                                <Checkbox onChange={handleOnChangeCheckAll} checked={checkedList.length === order?.orderItems?.length}></Checkbox>
+                                <Checkbox style={{ marginRight: '10px' }} onChange={handleOnChangeCheckAll} checked={checkedList.length === order?.orderItems?.length}></Checkbox>
                                 <span> Tất cả ({order?.orderItems?.length} sản phẩm) </span>
                             </span>
                             <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
@@ -228,7 +227,7 @@ const OrderPage = () => {
                                 return (
                                     <WrapperItemOrder>
                                         <div style={{ width: '390px', display: 'flex', alignItems: 'center' }} >
-                                            <Checkbox onChange={onChange} value={order?.product} checked={checkedList.includes(order?.product)} ></Checkbox>
+                                            <Checkbox style={{ marginRight: '10px' }} onChange={onChange} value={order?.product} checked={checkedList.includes(order?.product)} ></Checkbox>
                                             <img
                                                 onClick={() => handleToProductDetails(order?.product)}
                                                 src={order?.image}
