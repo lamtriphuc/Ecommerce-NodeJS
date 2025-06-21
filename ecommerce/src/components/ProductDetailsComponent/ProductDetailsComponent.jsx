@@ -134,8 +134,8 @@ const ProductDetailsComponent = ({ productId }) => {
                                 height: '48px',
                             }}
                             onClick={handleAddOrderProduct}
-                            textButton={'Mua ngay'}
-                            styleTextButton={{ color: '#fff' }}
+                            textButton={'Thêm vào giỏ'}
+                            styleTextButton={{ color: 'rgb(10, 104, 255)' }}
                         ></ButtonComponent>
                         <ButtonComponent
                             size={40}
@@ -146,8 +146,8 @@ const ProductDetailsComponent = ({ productId }) => {
                                 width: '220px',
                                 height: '48px',
                             }}
-                            textButton={'Thêm vào giỏ'}
-                            styleTextButton={{ color: 'rgb(10, 104, 255)' }}
+                            textButton={'Mua ngay'}
+                            styleTextButton={{ color: '#fff' }}
                         ></ButtonComponent>
                     </div>
                 </Col>

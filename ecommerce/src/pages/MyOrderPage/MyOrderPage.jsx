@@ -6,17 +6,28 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { WrapperContainer, WrapperListOrder, WrapperListOrderItem, WrapperOrderInfo, WrapperOrderItem, WrapperOrderItemInfo, WrapperOrderItemStatus, WrapperOrderPrice, WrapperOrderStatus } from './style'
 import { convertPrice } from '../../utils'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const MyOrderPage = () => {
-    const user = useSelector(state => state.user)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const { state } = location
 
-    const fetchMyOrder = () => OrderService.getAllOrderByUserId(user?._id, user?.access_token)
+    const fetchMyOrder = () => OrderService.getAllOrderByUserId(state?.id, state?.token)
     const queryOrder = useQuery({
         queryKey: ['orders'],
         queryFn: fetchMyOrder,
-        enabled: !!user?._id && !!user?.access_token,
+        enabled: !!state?.id && !!state?.token,
     })
     const { data, isPending } = queryOrder
+
+    const handleOrderDetails = (id) => {
+        navigate(`/order-details/${id}`, {
+            state: {
+                token: state?.token
+            }
+        })
+    }
 
     return (
         <Loading isLoading={isPending}>
@@ -25,6 +36,7 @@ const MyOrderPage = () => {
                     <h3 style={{ margin: '0', padding: '10px 0' }}>Đơn hàng của tôi</h3>
                     <WrapperListOrder>
                         {data?.data?.map(order => {
+                            console.log('order', order)
                             return (
                                 <WrapperListOrderItem>
                                     <WrapperOrderStatus>
@@ -70,6 +82,7 @@ const MyOrderPage = () => {
                                         <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Tổng tiền: </span>{convertPrice(order?.totalPrice)}
                                         <div style={{ margin: '10px 0', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                                             <ButtonComponent
+                                                onClick={() => handleOrderDetails(order?._id)}
                                                 size={40}
                                                 styleButton={{
                                                     background: '#fff',

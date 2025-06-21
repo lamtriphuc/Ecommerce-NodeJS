@@ -66,14 +66,14 @@ const createOrder = (newOrder) => {
 const getOrderDetails = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const order = await Order.findOne({
-                user: id
+            const order = await Order.findById({
+                _id: id
             })
 
             if (order === null) {
                 resolve({
                     status: 'OK',
-                    message: 'The product not found'
+                    message: 'The order not found'
                 })
             }
 
@@ -98,7 +98,7 @@ const getAllOrderByUser = (id) => {
             if (order === null) {
                 resolve({
                     status: 'OK',
-                    message: 'The product not found'
+                    message: 'The order not found'
                 })
             }
 
