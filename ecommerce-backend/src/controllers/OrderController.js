@@ -20,32 +20,7 @@ const createOrder = async (req, res) => {
     }
 }
 
-const preCreateOrder = async (req, res) => {
-    try {
-        const { shippingMethod, paymentMethod, itemsPrice, totalPrice, fullName, address, city, phone } = req.body
 
-        if (!shippingMethod || !paymentMethod || !itemsPrice || !totalPrice || !fullName || !address || !city || !phone) {
-            return res.status(200).json({
-                status: 'ERR',
-                message: 'The input is required'
-            })
-        }
-
-        const responseNewOrder = await OrderService.createOrder(req.body);
-
-        const payUrl = await PaymentService.createPayment(
-            { amount: totalPrice }, req
-        );
-
-        return res.status(200).json({ payUrl, responseNewOrder });
-    } catch (err) {
-        console.error('[SERVER ERROR] pre-create order:', err);
-        return res.status(500).json({
-            message: 'Tạo đơn hàng tạm thất bại',
-            error: err.message
-        });
-    }
-};
 
 const getOrderDetails = async (req, res) => {
     try {
@@ -107,5 +82,4 @@ module.exports = {
     getOrderDetails,
     getAllOrderByUser,
     deleteOrder,
-    preCreateOrder
 }

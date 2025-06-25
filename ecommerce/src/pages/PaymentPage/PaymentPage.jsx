@@ -216,7 +216,7 @@ const PaymentPage = () => {
             }
         } catch (err) {
             console.error('Lỗi khi thanh toán:', err);
-            message.error('Thanh toán thất bại');
+            message.error('Thanh toán thất bại payment');
         }
     };
 

@@ -12,7 +12,7 @@ const AdminPage = () => {
         getItem('Sản phẩm', 'product', <AppstoreOutlined />)
     ];
 
-    const [keySelected, setKeySelected] = useState('')
+    const [keySelected, setKeySelected] = useState('user')
 
     const randerPage = (key) => {
         switch (key) {
@@ -44,6 +44,7 @@ const AdminPage = () => {
                         height: '100vh',
                         boxShadow: '1px 1px 2px #ccc'
                     }}
+                    defaultSelectedKeys={['user']}
                     items={items}
                     onClick={handleOnClick}
                 />

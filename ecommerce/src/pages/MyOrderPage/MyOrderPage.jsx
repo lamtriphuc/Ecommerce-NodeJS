@@ -22,6 +22,7 @@ const MyOrderPage = () => {
         enabled: !!state?.id && !!state?.token,
     })
     const { data, isPending } = queryOrder
+    console.log('dayâ', data)
 
     const handleOrderDetails = (id) => {
         navigate(`/order-details/${id}`, {
@@ -73,7 +74,7 @@ const MyOrderPage = () => {
                                                 <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Giao hàng: </span> {order?.isDelivered ? 'Đã giao' : 'Chưa giao'}
                                             </div>
                                             <div>
-                                                <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Thanh toán: </span> {order?.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Thanh toán: </span><span style={{ color: order?.isPaid ? '#4ded4d' : 'unset' }}> {order?.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
                                             </div>
                                         </WrapperOrderStatus>
                                         <WrapperOrderInfo>

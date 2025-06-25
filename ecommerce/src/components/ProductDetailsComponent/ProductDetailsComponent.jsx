@@ -53,7 +53,7 @@ const ProductDetailsComponent = ({ productId }) => {
         }
     }
 
-    const handleAddOrderProduct = () => {
+    const handleAddProductToCart = () => {
         if (!user?._id) {
             navigate('/sign-in', { state: location?.pathname })
         } else {
@@ -71,9 +71,37 @@ const ProductDetailsComponent = ({ productId }) => {
         }
     }
 
+    const handleBuyProduct = () => {
+        handleAddProductToCart()
+        navigate('/order', {
+            state: {
+                buy: true
+            }
+        })
+    }
+
 
     return (
         <Loading isLoading={isPending}>
+            {productDetails?.countInStock === 0 && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    zIndex: 2000
+                }}>
+                    HẾT HÀNG
+                </div>
+            )}
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }} >
                 <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px' }}>
                     <Image src={productDetails?.image} alt='Product Image' preview={false} />
@@ -135,7 +163,7 @@ const ProductDetailsComponent = ({ productId }) => {
                                 width: '220px',
                                 height: '48px',
                             }}
-                            onClick={handleAddOrderProduct}
+                            onClick={handleAddProductToCart}
                             textButton={'Thêm vào giỏ'}
                             styleTextButton={{ color: 'rgb(10, 104, 255)' }}
                         ></ButtonComponent>
@@ -148,6 +176,7 @@ const ProductDetailsComponent = ({ productId }) => {
                                 width: '220px',
                                 height: '48px',
                             }}
+                            onClick={handleBuyProduct}
                             textButton={'Mua ngay'}
                             styleTextButton={{ color: '#fff' }}
                         ></ButtonComponent>

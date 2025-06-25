@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button, message, Result } from 'antd';
@@ -16,38 +16,38 @@ const PaymentResult = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [orderInfo, setOrderInfo] = useState(null);
     const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+    const isOrderCreated = useRef(false);
 
+    const mutationCreateOrder = useMutationHooks(
+        data => {
+            const { token, ...rests } = data
+            return OrderService.createOrder({ ...rests }, token)
+        }
+    )
+    const { isPending, data, isSuccess, isError } = mutationCreateOrder
 
-    const mutationCreateOrder = useMutation({
-        mutationFn: (data) => {
-            const { token, ...rests } = data;
-            return OrderService.createOrder(rests, token);
-        },
-        onSuccess: (data) => {
-            if (data.status === 'OK') {
-                localStorage.removeItem('orderInfo');
-                dispatch(removeAllOrderProduct({
-                    checkedList: orderInfo.orderItems.map(item => item.product)
-                }));
-                message.success('Thanh toán thành công!');
-                setTimeout(() => {
-                    navigate('/order-success', {
-                        state: {
-                            delivery: orderInfo.shippingMethod,
-                            payment: 'vnpay',
-                            orders: orderInfo.orderItems,
-                            totalPrice: orderInfo.itemsPrice
-                        }
-                    });
-                }, 2000);
-            } else {
-                message.error('Tạo đơn hàng thất bại!');
-            }
-        },
-        onError: () => {
+    useEffect(() => {
+        if (!isPending && isSuccess && data?.status === 'OK') {
+            localStorage.removeItem('orderInfo');
+            dispatch(removeAllOrderProduct({
+                checkedList: orderInfo.orderItems.map(item => item.product)
+            }));
+            message.success('Thanh toán thành công!');
+            setTimeout(() => {
+                navigate('/order-success', {
+                    state: {
+                        delivery: orderInfo.shippingMethod,
+                        payment: 'vnpay',
+                        orders: orderInfo.orderItems,
+                        totalPrice: orderInfo.itemsPrice
+                    }
+                });
+            }, 2000);
+        } else if (mutationCreateOrder.isError) {
             message.error('Lỗi khi tạo đơn hàng!');
         }
-    });
+    }, [isPending, data]);
+
 
     useEffect(() => {
         const checkPaymentResult = async () => {
@@ -64,13 +64,18 @@ const PaymentResult = () => {
             try {
                 setIsLoading(true);
                 const res = await axios.get(`/api/payment/vnpay-return${location.search}`);
-                setIsLoading(false);
 
-                if (res.data.code === '00') {
-                    setIsPaymentSuccess(true)
+                const isSuccess = res.data.code === '00';
+
+                if (isSuccess && !isOrderCreated.current) {
+                    isOrderCreated.current = true;
+                    parsed.isPaid = true;
+                    setIsPaymentSuccess(true);
                     mutationCreateOrder.mutate(parsed);
-                } else {
-                    message.error('Thanh toán thất bại!');
+                }
+
+                if (!isSuccess) {
+                    message.error('Thanh toán thất bại result 1!');
                     localStorage.removeItem('orderInfo');
                     navigate('/order');
                 }
@@ -80,6 +85,8 @@ const PaymentResult = () => {
                 message.error('Lỗi xác minh thanh toán!');
                 localStorage.removeItem('orderInfo');
                 navigate('/order');
+            } finally {
+                setIsLoading(false);
             }
         };
 

@@ -132,12 +132,13 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                             {user?.access_token ? (
                                 <Popover
                                     open={isOpenPopup}
+                                    onOpenChange={setIsOpenPopup}
                                     placement="bottom"
                                     trigger="click"
                                     content={content}
                                 >
                                     <div
-                                        onClick={() => setIsOpenPopup(prev => !prev)}
+                                        onClick={() => setIsOpenPopup(!isOpenPopup)}
                                         style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                         {userAvatar ? (
                                             <img src={userAvatar} alt="avatar" style={{

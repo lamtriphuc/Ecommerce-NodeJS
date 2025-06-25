@@ -14,7 +14,7 @@ import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as UserService from '../../services/UserService'
 import * as message from '../../components/Message/MessageComponent'
 import { updateUser } from '../../redux/slides/userSlide'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StepComponent from '../../components/StepComponent/StepComponent'
 
 const OrderPage = () => {
@@ -24,6 +24,7 @@ const OrderPage = () => {
     const [isOpenModelUpdateInfo, setIsOpenModelUpdateInfo] = useState(false)
     const [form] = Form.useForm()
     const dispatch = useDispatch()
+    const location = useLocation()
     const navigate = useNavigate()
     const [stateUserDetails, setStateUserDetails] = useState({
         name: '',
@@ -31,6 +32,7 @@ const OrderPage = () => {
         address: '',
         city: ''
     })
+    const { state } = location // state.buy
 
     const mutationUpdate = useMutationHooks(
         (data) => {
@@ -98,6 +100,12 @@ const OrderPage = () => {
         }
     }
 
+    useEffect(() => {
+        if (state?.buy && order?.orderItems) {
+            const newCheckedList = order.orderItems.map(item => item.product);
+            setCheckedList(newCheckedList);
+        }
+    }, [state?.buy, order?.orderItems]);
 
 
     const priceMemo = useMemo(() => {

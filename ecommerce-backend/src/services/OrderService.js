@@ -3,7 +3,7 @@ const Product = require('../models/ProductModel');
 
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-        const { orderItems, shippingMethod, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user } = newOrder
+        const { orderItems, shippingMethod, paymentMethod, isPaid, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user } = newOrder
         try {
             // Bước 1: kiểm tra tồn kho và cập nhật sản phẩm
             const failedItems = [];
@@ -49,7 +49,8 @@ const createOrder = (newOrder) => {
                 itemsPrice,
                 shippingPrice,
                 totalPrice,
-                user
+                user,
+                isPaid
             })
 
             return resolve({
