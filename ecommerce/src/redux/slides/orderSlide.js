@@ -21,7 +21,7 @@ export const orderSlice = createSlice({
     initialState,
     reducers: {
         addOrderProduct: (state, action) => {
-            const { orderItem } = action.payload;
+            const { orderItem } = action.payload
             // Tìm sản phẩm trong giỏ hàng (nếu đã có)
             const existingItem = state?.orderItems?.find(
                 item => item?.product === orderItem.product

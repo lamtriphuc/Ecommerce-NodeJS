@@ -6,6 +6,7 @@ import OrderDetailsPage from "../pages/OrderDetailsPage/OrderDetailsPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
 import OrderSuccess from "../pages/OrderSucces/OrderSucces";
 import PaymentPage from "../pages/PaymentPage/PaymentPage";
+import PaymentResult from "../pages/PaymentResult/PaymentResult";
 import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductPage from "../pages/ProductsPage/ProductPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
@@ -37,6 +38,11 @@ export const routes = [
     {
         path: '/payment',
         page: PaymentPage,
+        isShowHeader: true
+    },
+    {
+        path: '/payment/vnpay_return',
+        page: PaymentResult,
         isShowHeader: true
     },
     {

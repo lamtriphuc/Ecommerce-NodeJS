@@ -68,7 +68,8 @@ const OrderPage = () => {
         }
     }, [isOpenModelUpdateInfo])
 
-    const handleChangeCount = (type, productId) => {
+    const handleChangeCount = (type, productId, limited) => {
+        if (limited) return
         if (type === 'increase') {
             dispatch(increaseAmount({ productId }))
         }
@@ -248,11 +249,11 @@ const OrderPage = () => {
                                                 <span style={{ fontSize: '13px', color: '#242424' }}>{convertPrice(order?.price)}</span>
                                             </span>
                                             <WrapperCountOrder>
-                                                <button style={{ border: 'none', background: 'transparent' }} onClick={() => handleChangeCount('decrease', order?.product)}>
+                                                <button style={{ border: 'none', background: 'transparent' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 1)}>
                                                     <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
                                                 </button>
                                                 <WrapperInputNumber min={1} defaultValue={order?.amount} value={order?.amount} size='small' />
-                                                <button style={{ border: 'none', background: 'transparent' }} onClick={() => handleChangeCount('increase', order?.product)}>
+                                                <button style={{ border: 'none', background: 'transparent' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order?.countInStock)}>
                                                     <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
                                                 </button>
                                             </WrapperCountOrder>

@@ -12,7 +12,7 @@ import Loading from '../LoadingComponent/Loading'
 import { Rate } from "antd";
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { addOrderProduct } from '../../redux/slides/orderSlide'
+import { addOrderProduct, orderSlice } from '../../redux/slides/orderSlide'
 import { convertPrice } from '../../utils'
 
 const ProductDetailsComponent = ({ productId }) => {
@@ -42,7 +42,8 @@ const ProductDetailsComponent = ({ productId }) => {
         enabled: !!productId
     })
 
-    const handleChangeCount = (type) => {
+    const handleChangeCount = (type, limited) => {
+        if (limited) return
         if (type === 'increase') {
             setNumProduct(numProduct + 1)
         } else {
@@ -63,7 +64,8 @@ const ProductDetailsComponent = ({ productId }) => {
                     image: productDetails?.image,
                     price: productDetails?.price,
                     product: productDetails?._id,
-                    discount: productDetails?.discount
+                    discount: productDetails?.discount,
+                    countInStock: productDetails?.countInStock
                 }
             }))
         }
@@ -118,7 +120,7 @@ const ProductDetailsComponent = ({ productId }) => {
                                 <MinusOutlined style={{ color: '#000', fontSize: '16px' }} />
                             </button>
                             <WrapperInputNumber min={1} defaultValue={1} onChange={onChange} value={numProduct} size='small' />
-                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase')}>
+                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', numProduct === productDetails?.countInStock)}>
                                 <PlusOutlined style={{ color: '#000', fontSize: '16px' }} />
                             </button>
                         </WrapperQuantityProduct>

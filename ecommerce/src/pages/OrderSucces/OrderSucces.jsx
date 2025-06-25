@@ -10,19 +10,49 @@ const OrderSuccess = () => {
     const order = useSelector(state => state.order)
     const location = useLocation()
     const { state } = location
+    console.log('state', state)
+
+    const deliveryMethod = (method) => {
+        if (method === 'fast') {
+            return (
+                <span style={{ fontWeight: 'bold', color: '#F77E00' }}>GHN </span>
+            )
+        }
+        if (method === 'save') {
+            return (
+                <span style={{ fontWeight: 'bold', color: '#008B48' }}>GHTK </span>
+            )
+        }
+        if (method === 'jt') {
+            return (
+                <span style={{ fontWeight: 'bold', color: '#F60002' }}>J&T </span>
+            )
+        }
+    }
+
+    const payMethod = (method) => {
+        if (method === 'cod') {
+            return (
+                <span style={{ fontWeight: 'bold', color: '#000' }}>COD </span>
+            )
+        }
+        return (
+            <span style={{ fontWeight: 'bold', color: '#2A60AA' }}>VNPay </span>
+        )
+    }
 
     return (
         <div style={{ background: '#f5f5fa', width: '100%', height: '100vh' }}>
             <Loading isLoading={false}>
                 <div style={{ height: '100%', width: '1270px', margin: '0 auto' }} >
-                    <h3>Đơn hàng đặt thành công</h3>
+                    <h3 style={{ margin: '0', padding: '20px 0' }}>Đơn hàng đặt thành công</h3>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }} >
                         <WrapperContainer>
                             <WrapperInfo>
                                 <div>
                                     <label style={{ fontWeight: 'bold' }}>Phương thức giao hàng</label>
                                     <WrapperValue>
-                                        <span style={{ fontWeight: 'bold', color: '#F77E00' }}>{orderConstant.delivery[state?.delivery]} </span>
+                                        <span>{deliveryMethod(state?.delivery)}  </span><span>{orderConstant.delivery[state?.delivery]}</span>
                                     </WrapperValue>
                                 </div>
                             </WrapperInfo>
@@ -30,7 +60,7 @@ const OrderSuccess = () => {
                                 <div>
                                     <label>Phương thức thanh toán</label>
                                     <WrapperValue>
-                                        <span style={{ fontWeight: 'bold', color: '#000' }}>{orderConstant.payment[state?.payment]}  </span>
+                                        <span>{payMethod(state?.payment)}  </span><span>{orderConstant.payment[state?.payment]}</span>
                                     </WrapperValue>
                                 </div>
                             </WrapperInfo>

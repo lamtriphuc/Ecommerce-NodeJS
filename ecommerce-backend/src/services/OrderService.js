@@ -113,9 +113,56 @@ const getAllOrderByUser = (id) => {
     })
 }
 
+const deleteOrder = async (id, orderItems) => {
+    try {
+        const order = await Order.findByIdAndDelete(id)
+
+        if (order === null) {
+            return {
+                status: 'ERR',
+                message: 'The order not found'
+            }
+        }
+
+        const failedItems = [];
+
+        for (const item of orderItems) {
+            const productData = await Product.findOneAndUpdate(
+                {
+                    _id: item.product
+                },
+                {
+                    $inc: {
+                        sold: -item.amount,
+                        countInStock: +item.amount
+                    }
+                },
+                { new: true }
+            );
+
+            if (!productData) {
+                failedItems.push(item.product)
+            }
+        }
+
+        return {
+            status: 'OK',
+            message: 'Delete order success',
+            data: order,
+            failedItems
+        };
+    } catch (error) {
+        return {
+            status: 'ERR',
+            message: 'Something went wrong: ' + error.message
+        };
+    }
+}
+
 
 module.exports = {
     createOrder,
     getOrderDetails,
-    getAllOrderByUser
+    getAllOrderByUser,
+    deleteOrder
 }

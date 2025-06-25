@@ -1,16 +1,15 @@
 const OrderService = require('../services/OrderService')
+const PaymentService = require('../services/PaymentService')
 
 const createOrder = async (req, res) => {
     try {
         const { shippingMethod, paymentMethod, itemsPrice, totalPrice, fullName, address, city, phone } = req.body
 
         if (!shippingMethod || !paymentMethod || !itemsPrice || !totalPrice || !fullName || !address || !city || !phone) {
-            console.log('controller', req.body)
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
             })
-
         }
         const response = await OrderService.createOrder(req.body);
         return res.status(200).json(response);
@@ -20,6 +19,33 @@ const createOrder = async (req, res) => {
         })
     }
 }
+
+const preCreateOrder = async (req, res) => {
+    try {
+        const { shippingMethod, paymentMethod, itemsPrice, totalPrice, fullName, address, city, phone } = req.body
+
+        if (!shippingMethod || !paymentMethod || !itemsPrice || !totalPrice || !fullName || !address || !city || !phone) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The input is required'
+            })
+        }
+
+        const responseNewOrder = await OrderService.createOrder(req.body);
+
+        const payUrl = await PaymentService.createPayment(
+            { amount: totalPrice }, req
+        );
+
+        return res.status(200).json({ payUrl, responseNewOrder });
+    } catch (err) {
+        console.error('[SERVER ERROR] pre-create order:', err);
+        return res.status(500).json({
+            message: 'Tạo đơn hàng tạm thất bại',
+            error: err.message
+        });
+    }
+};
 
 const getOrderDetails = async (req, res) => {
     try {
@@ -57,8 +83,29 @@ const getAllOrderByUser = async (req, res) => {
     }
 }
 
+const deleteOrder = async (req, res) => {
+    try {
+        const orderId = req.params.id
+        const { orderItems } = req.body
+        if (!orderId) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The orderId is required'
+            })
+        }
+        const response = await OrderService.deleteOrder(orderId, orderItems)
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(404).json({
+            message: "Lỗi" + error.message
+        })
+    }
+}
+
 module.exports = {
     createOrder,
     getOrderDetails,
-    getAllOrderByUser
+    getAllOrderByUser,
+    deleteOrder,
+    preCreateOrder
 }

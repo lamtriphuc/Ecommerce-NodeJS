@@ -11,6 +11,7 @@ export const WrapperStyleColSmall = styled(Col)`
 `
 export const WrapperStyleNameProduct = styled.h1`
     margin: 0px;
+    padding-bottom: 10px;
     color: rgb(39, 39, 42);
     font-size: 20px;
     font-weight: 500;
