@@ -1,5 +1,5 @@
-import { Image } from 'antd'
-import React, { useState } from 'react'
+import { Button, Divider, Image } from 'antd'
+import React, { useEffect, useState } from 'react'
 import { Col, Row } from 'antd'
 import productImage from '../../assets/images/test.webp'
 import productImageSmall from '../../assets/images/imagesmall.webp'
@@ -14,14 +14,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { addOrderProduct, orderSlice } from '../../redux/slides/orderSlide'
 import { convertPrice } from '../../utils'
+import TextArea from 'antd/es/input/TextArea'
+import SliderComponent from '../SliderComponent/SliderComponent'
 
 const ProductDetailsComponent = ({ productId }) => {
     const [numProduct, setNumProduct] = useState(1)
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
+    const [rate, setRate] = useState(0)
+    const [comment, setComment] = useState('')
 
     const user = useSelector(state => state.user)
+
 
     const onChange = (value) => {
         setNumProduct(Number(value))
@@ -80,6 +85,13 @@ const ProductDetailsComponent = ({ productId }) => {
         })
     }
 
+    const productImages = productDetails?.image.split(',') || []
+    const [selectedImage, setSelectedImage] = useState('');
+    useEffect(() => {
+        if (productImages.length > 0) {
+            setSelectedImage(productImages[0]);
+        }
+    }, [productDetails]);
 
     return (
         <Loading isLoading={isPending}>
@@ -103,27 +115,16 @@ const ProductDetailsComponent = ({ productId }) => {
                 </div>
             )}
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }} >
-                <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px' }}>
-                    <Image src={productDetails?.image} alt='Product Image' preview={false} />
-                    <Row style={{ paddingTop: '10px', justifyContent: 'space-between' }}>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
-                        <WrapperStyleColSmall span={4}>
-                            <WrapperStyleImageSmall src={productImageSmall} alt='Product Image' preview={false} />
-                        </WrapperStyleColSmall>
+                <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Image src={selectedImage} alt='Product Image 1' preview={false} style={{ height: '500px' }} />
+                    <Row style={{ paddingTop: '10px', justifyContent: 'center', alignItems: 'flex-end', gap: '10px' }}>
+                        {productImages.map((img, idx) => {
+                            return (
+                                <WrapperStyleColSmall span={4} key={idx} onClick={() => setSelectedImage(img)}>
+                                    <WrapperStyleImageSmall src={img} alt='Product Image' preview={false} />
+                                </WrapperStyleColSmall>
+                            )
+                        })}
                     </Row>
                 </Col>
                 <Col span={14} style={{ paddingLeft: '10px' }}>
@@ -183,7 +184,38 @@ const ProductDetailsComponent = ({ productId }) => {
                     </div>
                 </Col>
             </Row >
-        </Loading>
+            <Divider />
+            <div style={{ background: '#fff', paddingTop: '20px' }}>
+                <div style={{
+                    width: 'fit-content', border: '1px solid #ccc', margin: '0 20px', padding: '10px'
+                }}>
+                    Mô tả sản phẩm
+                </div>
+                <Row style={{ background: '#fff', borderRadius: '4px', margin: '0 20px', paddingBottom: '40px' }} >
+                    <Col span={16} style={{ border: '1px solid #ccc', padding: '20px', fontSize: '16px' }}>
+                        <p style={{ whiteSpace: 'pre-line' }}>
+                            {productDetails?.description}
+                        </p>
+                    </Col>
+                    <Col span={8} style={{ border: '1px solid #ccc', padding: '20px', fontSize: '16px' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '20px', textAlign: 'center', marginBottom: '10px' }}>
+                            <span>Đánh giá sản phẩm</span>
+                        </div>
+                        <Rate allowHalf defaultValue={rate} value={rate} onChange={value => setRate(value)} />
+                        <TextArea
+                            style={{ marginTop: '10px' }}
+                            rows={4}
+                            placeholder='Nhập đánh giá của bạn'
+                            value={comment}
+                            onChange={e => setComment(e.target.value)}
+                        />
+                        <div style={{ textAlign: 'end', marginTop: '10px' }}>
+                            <Button style={{ width: '80px' }}>Đăng</Button>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
+        </Loading >
     )
 }
 

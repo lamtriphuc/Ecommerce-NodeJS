@@ -8,6 +8,11 @@ export const WrapperStyleImageSmall = styled(Image)`
 
 export const WrapperStyleColSmall = styled(Col)`
     flex-basis: unset;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 `
 export const WrapperStyleNameProduct = styled.h1`
     margin: 0px;

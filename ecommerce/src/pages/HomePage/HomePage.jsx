@@ -4,8 +4,6 @@ import SliderComponent from '../../components/SliderComponent/SliderComponent'
 import { WrapperButtonMore, WrapperProducts, WrapperTypeProduct } from './style'
 import slider1 from '../../assets/images/slider1.png'
 import slider2 from '../../assets/images/slider2.png'
-import slider3 from '../../assets/images/slider3.png'
-import slider4 from '../../assets/images/slider4.png'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
@@ -47,6 +45,8 @@ const HomePage = () => {
         fetchAllTypeProduct()
     }, [])
 
+
+
     return (
         <>
             <div style={{ width: '1270px', margin: '0 auto' }}>
@@ -60,17 +60,18 @@ const HomePage = () => {
             </div>
             <div className='body' style={{ backgroundColor: '#efefef', width: '100%' }}>
                 <div id='container' style={{ width: '1270px', margin: '0 auto', height: '100%' }}>
-                    <SliderComponent arrImages={[slider1, slider2, slider3, slider4]} />
+                    <SliderComponent arrImages={[slider1, slider2]} />
                     <Loading isLoading={isPending || isLoading}>
                         <WrapperProducts>
                             {products?.data?.map((product) => {
+                                const productImages = product?.image.split(',') || []
                                 return (
                                     <CardComponent
                                         key={product._id}
                                         id={product._id}
                                         countInStock={product.countInStock}
                                         description={product.description}
-                                        image={product.image}
+                                        image={productImages[0]}
                                         name={product.name}
                                         price={product.price}
                                         rating={product.rating}

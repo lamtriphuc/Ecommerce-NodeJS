@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { WrapperHeader, WrapperUploadFile } from './style'
 import { Button, Form, Modal, Select, Space } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, FileImageTwoTone } from '@ant-design/icons'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import { convertPrice, getBase64, renderOptions } from '../../utils'
@@ -13,6 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import { useSelector } from 'react-redux'
 import ModalComponent from '../ModalComponent/ModalComponent'
+import TextArea from 'antd/es/input/TextArea'
 
 const AdminProduct = () => {
     const [formCreate] = Form.useForm();  // Dùng cho Modal thêm
@@ -24,10 +25,12 @@ const AdminProduct = () => {
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false)
     const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
     const [typeSelect, setTypeSelect] = useState('')
+    const [isLoadingUploadImage, setIsLoadingUploadImage] = useState(false)
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+    const searchInput = useRef(null)
+    const [fileList, setFileList] = useState([]);
 
     const [stateProduct, setStateProduct] = useState({
         name: '',
@@ -417,6 +420,7 @@ const AdminProduct = () => {
 
     const handleCancel = () => {
         setIsModalOpen(false)
+        setFileList([])
         formCreate.resetFields()
     }
 
@@ -432,7 +436,12 @@ const AdminProduct = () => {
         })
     }
 
-    const onFinish = () => {
+    const onFinish = async () => {
+        setIsLoadingUploadImage(true)
+        const urls = await uploadImagesToCloudinary({ fileList });
+        setIsLoadingUploadImage(false)
+        console.log('urls', urls)
+        console.log('stateProduct.image', stateProduct.image)
         const params = {
             name: stateProduct.name,
             price: stateProduct.price,
@@ -440,7 +449,7 @@ const AdminProduct = () => {
             rating: stateProduct.rating,
             type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
             countInStock: stateProduct.countInStock,
-            image: stateProduct.image,
+            image: urls,
             discount: stateProduct.discount
         }
         mutation.mutate(params, {
@@ -476,32 +485,37 @@ const AdminProduct = () => {
     //     })
     // }
 
-    const handleOnChangeImage = async ({ fileList }) => {
-        const file = fileList[0]?.originFileObj;
-        if (!file) return;
+    const uploadImagesToCloudinary = async ({ fileList }) => {
+        const validFiles = fileList
+            .map(file => file.originFileObj)
+            .filter(Boolean);
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'upload-image');
+        const urls = [];
 
-        try {
-            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
+        for (const file of validFiles) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'upload-image');
 
-            if (data.secure_url) {
-                setStateProduct({
-                    ...stateProduct,
-                    image: data.secure_url
+            try {
+                const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+                    method: 'POST',
+                    body: formData
                 });
-            } else {
-                console.error('Upload lỗi:', data);
+                const data = await res.json();
+
+                if (data.secure_url) {
+                    urls.push(data.secure_url);
+                } else {
+                    console.error('Upload lỗi:', data);
+                }
+            } catch (err) {
+                console.error('Lỗi upload Cloudinary:', err);
             }
-        } catch (err) {
-            console.error('Lỗi upload Cloudinary:', err);
         }
+
+
+        return urls.join(',')
     }
 
     const handleOnChangeImageDetails = async ({ fileList }) => {
@@ -587,7 +601,7 @@ const AdminProduct = () => {
                 onCancel={handleCancel}
                 footer={null}
             >
-                <Loading isLoading={isPending}>
+                <Loading isLoading={isPending || isLoadingUploadImage}>
                     <Form
                         form={formCreate}
                         name="basic"
@@ -663,10 +677,12 @@ const AdminProduct = () => {
                             name="description"
                             rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
                         >
-                            <InputComponent
+                            <TextArea
+                                name="description"
+                                rows={4}
+                                placeholder='Nhập mô tả sản phẩm'
                                 value={stateProduct.description}
                                 onChange={handleOnChage}
-                                name='description'
                             />
                         </Form.Item>
                         <Form.Item
@@ -694,18 +710,20 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Ảnh"
                             name="image"
-                            rules={[{ required: true, message: 'Hãy nhập ảnh sản phẩm!' }]}
                         >
-                            <WrapperUploadFile onChange={handleOnChangeImage} maxCount={2} beforeUpload={() => false} >
+                            <WrapperUploadFile style={{ marginBottom: '10px' }}
+                                onChange={({ fileList }) => { setFileList(fileList) }}
+                                maxCount={4}
+                                multiple
+                                beforeUpload={() => false}
+                            >
                                 <Button>Upload</Button>
-                                {stateProduct?.image && (
-                                    <img src={stateProduct?.image} alt='product-image' style={{
-                                        height: '60px',
-                                        width: '60px',
-                                        objectFit: 'cover',
-                                    }} />
-                                )}
                             </WrapperUploadFile>
+                            {fileList.map((fileName, index) => {
+                                return (
+                                    <div><FileImageTwoTone />{fileName.name}</div>
+                                )
+                            })}
                         </Form.Item>
 
                         <Form.Item label={null}>
@@ -779,10 +797,12 @@ const AdminProduct = () => {
                             name="description"
                             rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
                         >
-                            <InputComponent
+                            <TextArea
+                                name='description'
+                                rows={4}
+                                placeholder='Nhập mô tả sản phẩm'
                                 value={stateProductDetails.description}
                                 onChange={handleOnChageDetails}
-                                name='description'
                             />
                         </Form.Item>
                         <Form.Item
@@ -812,7 +832,7 @@ const AdminProduct = () => {
                             name="image"
                             rules={[{ required: true, message: 'Hãy nhập ảnh sản phẩm!' }]}
                         >
-                            <WrapperUploadFile style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onChange={handleOnChangeImageDetails} maxCount={2} beforeUpload={() => false} >
+                            <WrapperUploadFile style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onChange={handleOnChangeImageDetails} maxCount={4} multiple beforeUpload={() => false} >
                                 <Button>Upload</Button>
                                 {stateProductDetails?.image && (
                                     <img src={stateProductDetails?.image} alt='product-image' style={{

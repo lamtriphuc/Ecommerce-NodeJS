@@ -7,8 +7,8 @@ const ProductDetailsPage = () => {
   const navigate = useNavigate()
 
   return (
-    <div style={{ width: '100%', background: '#f5f5fa', height: 'calc(100vh - 64px)' }}>
-      <div style={{ width: '1270px', height: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', background: '#f5f5fa', height: '100%' }}>
+      <div style={{ width: '1270px', height: '100%', margin: '0 auto', background: '#fff' }}>
         <p style={{ margin: '0', padding: '10px 0', fontSize: '14px' }}>
           <span
             onClick={() => navigate('/')}

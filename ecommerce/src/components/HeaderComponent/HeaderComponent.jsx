@@ -96,7 +96,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
         <div style={{ width: '100%', background: 'rgb(26, 148, 255)', display: 'flex', justifyContent: 'center' }}>
             <WapperHeader style={{ justifyContent: isHiddenSearch && isHiddenCart ? 'space-between' : 'unset' }}>
                 <Col span={4}>
-                    <WrapperTextHeader onClick={() => navigate('/')}>LAMTRIPHUC</WrapperTextHeader>
+                    <WrapperTextHeader onClick={() => navigate('/')}>Decora </WrapperTextHeader>
                 </Col>
                 {!isHiddenSearch && (
                     <Col span={12}>
