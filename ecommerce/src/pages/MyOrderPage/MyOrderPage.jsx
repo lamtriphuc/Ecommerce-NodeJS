@@ -83,7 +83,7 @@ const MyOrderPage = () => {
                                                     <WrapperOrderItem>
                                                         <div style={{ display: 'flex', alignItems: 'center' }} >
                                                             <img
-                                                                src={item?.image}
+                                                                src={item?.image.split(',')[0]}
                                                                 style={{ width: '70px', height: '70px', objectFit: 'cover', padding: '0 10px', cursor: 'pointer' }} alt='Ảnh' />
                                                             <div
                                                                 style={{

@@ -58,6 +58,17 @@ const getAllOrderByUser = async (req, res) => {
     }
 }
 
+const getAllOrder = async (req, res) => {
+    try {
+        const data = await OrderService.getAllOrder();
+        return res.status(200).json(data);
+    } catch (error) {
+        return res.status(404).json({
+            message: "Lỗi" + error.message
+        })
+    }
+}
+
 const deleteOrder = async (req, res) => {
     try {
         const orderId = req.params.id
@@ -77,9 +88,25 @@ const deleteOrder = async (req, res) => {
     }
 }
 
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { shippingStatus, isPaid } = req.body
+
+        console.log('id', id, shippingStatus, isPaid)
+
+        const response = await OrderService.updateOrderStatus(id, shippingStatus, isPaid)
+        res.status(200).json(response)
+    } catch (err) {
+        res.status(500).json({ status: 'ERROR', message: 'Cập nhật thất bại' })
+    }
+}
+
 module.exports = {
     createOrder,
     getOrderDetails,
     getAllOrderByUser,
     deleteOrder,
+    getAllOrder,
+    updateOrderStatus
 }

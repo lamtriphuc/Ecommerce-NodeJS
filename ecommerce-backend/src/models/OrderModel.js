@@ -33,9 +33,17 @@ const orderSchema = new mongoose.Schema({
     },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
-    isDelivered: { type: Boolean, default: false },
+    shippingStatus: {
+        type: String,
+        enum: ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'returned'],
+        default: 'pending'
+    },
     deliveredAt: { type: Date },
-}
+
+},
+    {
+        timestamps: true
+    }
 );
 
 const Order = mongoose.model('Order', orderSchema);

@@ -116,8 +116,9 @@ const ProductDetailsComponent = ({ productId }) => {
             )}
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }} >
                 <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Image src={selectedImage} alt='Product Image 1' preview={false} style={{ height: '500px' }} />
-                    <Row style={{ paddingTop: '10px', justifyContent: 'center', alignItems: 'flex-end', gap: '10px' }}>
+                    <SliderComponent arrImages={productImages} />
+                    {/* <Image src={selectedImage} alt='Product Image 1' preview={false} style={{ height: '500px' }} /> */}
+                    <Row style={{ paddingTop: '10px', justifyContent: 'center', alignItems: 'flex-end', gap: '10px', marginTop: '10px' }}>
                         {productImages.map((img, idx) => {
                             return (
                                 <WrapperStyleColSmall span={4} key={idx} onClick={() => setSelectedImage(img)}>

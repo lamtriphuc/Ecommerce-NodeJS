@@ -114,6 +114,22 @@ const getAllOrderByUser = (id) => {
     })
 }
 
+const getAllOrder = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allOrder = await Order.find()
+
+            resolve({
+                status: 'OK',
+                message: 'Get order Success',
+                data: allOrder
+            })
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 const deleteOrder = async (id, orderItems) => {
     try {
         const order = await Order.findByIdAndDelete(id)
@@ -161,9 +177,27 @@ const deleteOrder = async (id, orderItems) => {
 }
 
 
+const updateOrderStatus = async (id, shippingStatus, isPaid) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const updated = await Order.findByIdAndUpdate(id, { shippingStatus, isPaid }, { new: true })
+
+            resolve({
+                status: 'OK',
+                message: 'Get order Success',
+                data: updated
+            })
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 module.exports = {
     createOrder,
     getOrderDetails,
     getAllOrderByUser,
-    deleteOrder
+    deleteOrder,
+    getAllOrder,
+    updateOrderStatus
 }

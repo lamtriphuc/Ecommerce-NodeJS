@@ -2,41 +2,50 @@ import Slider from "react-slick";
 import styled from "styled-components";
 
 export const WrapperSliderStyle = styled(Slider)`
-    & .slick-arrow.slick-prev {
-        left: 12px;
-        top: 50%;
-        z-index: 10;
-        &::before {
-            font-size: 40px;
-            color: #fff;
-        }
-    }
+  width: 100%;
+  .slick-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    & .slick-arrow.slick-next {
-        right: 28px;
-        top: 50%;
-        z-index: 10;
-        &::before {
-            font-size: 40px;
-            color: #fff;
-        }
+  .slick-slide img {
+    max-height: 500px;
+    object-fit: contain;
+  }
+
+  .slick-arrow.slick-prev {
+    left: 12px;
+    top: 50%;
+    z-index: 10;
+    &::before {
+      font-size: 40px;
+      color: #000; /* đổi từ trắng sang đen nếu nền ảnh sáng */
     }
-        & .slick-dots {
-        z-index: 10;
-        bottom: -2px !important;
-        li {
-            button {
-                &::before {
-                    font-size: 8px;
-                    color: rgb(255, 255, 0.5);
-                }
-            }
+  }
+
+  .slick-arrow.slick-next {
+    right: 28px;
+    top: 50%;
+    z-index: 10;
+    &::before {
+      font-size: 40px;
+      color: #000;
+    }
+  }
+
+  .slick-dots {
+    bottom: -20px;
+    li {
+      button {
+        &::before {
+          font-size: 10px;
+          color: rgba(233, 216, 216, 0.5); /* dot mờ */
         }
-        li.active {
-            button {
-                &::before {
-                    color: #fff;
-                }
-            }
-        }
-`
+      }
+    }
+    li.slick-active button::before {
+      color: #000; /* dot active */
+    }
+  }
+`;

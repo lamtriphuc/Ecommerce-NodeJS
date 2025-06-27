@@ -239,7 +239,7 @@ const OrderPage = () => {
                                             <Checkbox style={{ marginRight: '10px' }} onChange={onChange} value={order?.product} checked={checkedList.includes(order?.product)} ></Checkbox>
                                             <img
                                                 onClick={() => handleToProductDetails(order?.product)}
-                                                src={order?.image}
+                                                src={order?.image.split(',')[0]}
                                                 style={{ width: '70px', height: '70px', objectFit: 'cover', padding: '0 10px', cursor: 'pointer' }} alt='OK' />
                                             <div
                                                 onClick={() => handleToProductDetails(order?.product)}

@@ -36,11 +36,24 @@ function App() {
   }
 
   UserService.axiosJWT.interceptors.request.use(async (config) => {
+    let token = localStorage.getItem("access_token")
+    // Không có token => không làm gì thêm, để request đi luôn
+    if (!token || !isJsonString(token)) {
+      return config
+    }
+    token = JSON.parse(token)
+
     const currentTime = new Date()
     const { decoded } = handleDecoded()
+
     if (decoded?.exp < currentTime.getTime() / 1000) {
       const data = await UserService.refreshToken()
-      config.headers['token'] = `Bearer ${data?.access_token}`
+      const newAccessToken = data?.access_token
+      localStorage.setItem("access_token", JSON.stringify(newAccessToken))
+      config.headers['token'] = `Bearer ${newAccessToken}`
+    } else {
+      // Token còn hạn
+      config.headers['token'] = `Bearer ${token}`
     }
     return config;
   }, (error) => {
@@ -54,14 +67,6 @@ function App() {
     setIsLoading(false)
     // } catch (error) { }
   }
-
-  // const fetchApi = async () => {
-  //   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
-  //   return res.data
-  // }
-
-  // const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
-  // console.log('quẻry', query)
 
   return (
     <div>
