@@ -60,3 +60,12 @@ export const getAllTypeProduct = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all-type`)
     return res.data
 }
+
+export const submitComment = async (productId, data, access_token) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/${productId}/comments`, data, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    })
+    return res.data
+}

@@ -91,3 +91,14 @@ export const WrapperInputNumber = styled(InputNumber)`
         text-align: center;
     }
 `
+
+export const WrapperComment = styled.div`
+    margin-top: 10px;
+    min-height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+`

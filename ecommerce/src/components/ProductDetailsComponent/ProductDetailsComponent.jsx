@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Col, Row } from 'antd'
 import productImage from '../../assets/images/test.webp'
 import productImageSmall from '../../assets/images/imagesmall.webp'
-import { WrapperAddressProduct, WrapperDiscountText, WrapperInputNumber, WrapperPriceProduct, WrapperPriceTextProduct, WrapperQuantityProduct, WrapperStyleColSmall, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStyleTextSell } from './style'
+import { WrapperAddressProduct, WrapperComment, WrapperDiscountText, WrapperInputNumber, WrapperPriceProduct, WrapperPriceTextProduct, WrapperQuantityProduct, WrapperStyleColSmall, WrapperStyleImageSmall, WrapperStyleNameProduct, WrapperStyleTextSell } from './style'
 import { StarFilled, PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import * as ProductService from '../../services/ProductService'
@@ -16,6 +16,8 @@ import { addOrderProduct, orderSlice } from '../../redux/slides/orderSlide'
 import { convertPrice } from '../../utils'
 import TextArea from 'antd/es/input/TextArea'
 import SliderComponent from '../SliderComponent/SliderComponent'
+import * as message from '../../components/Message/MessageComponent'
+import { DeleteOutlined } from '@ant-design/icons'
 
 const ProductDetailsComponent = ({ productId }) => {
     const [numProduct, setNumProduct] = useState(1)
@@ -24,6 +26,7 @@ const ProductDetailsComponent = ({ productId }) => {
     const dispatch = useDispatch()
     const [rate, setRate] = useState(0)
     const [comment, setComment] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
     const user = useSelector(state => state.user)
 
@@ -41,7 +44,7 @@ const ProductDetailsComponent = ({ productId }) => {
 
     }
 
-    const { isPending, data: productDetails } = useQuery({
+    const { isPending, data: productDetails, refetch } = useQuery({
         queryKey: ['product-details', productId],
         queryFn: fetchGetDetailsProduct,
         enabled: !!productId
@@ -93,6 +96,33 @@ const ProductDetailsComponent = ({ productId }) => {
         }
     }, [productDetails]);
 
+    const handleSubmit = async () => {
+        if (!rate || !comment) {
+            return message.warning('Vui lòng đánh giá sao và viết bình luận!')
+        }
+        try {
+            setIsLoading(true);
+            const response = await ProductService.submitComment(
+                productDetails?._id,
+                { rate, comment },
+                user?.access_token
+            )
+            console.log('response', response)
+            if (response.status === 'OK') {
+                await refetch();
+                message.success('Gửi đánh giá thành công!');
+            } else if (response.status === 'ERR') {
+                message.warning(response.message);
+            }
+            setRate(0);
+            setComment('');
+        } catch (error) {
+            message.error('Lỗi khi đánh giá sản phẩn: ')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return (
         <Loading isLoading={isPending}>
             {productDetails?.countInStock === 0 && (
@@ -116,7 +146,17 @@ const ProductDetailsComponent = ({ productId }) => {
             )}
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }} >
                 <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <SliderComponent arrImages={productImages} />
+                    <SliderComponent
+                        arrImages={productImages}
+                        settings={{
+                            dots: true,
+                            infinite: true,
+                            speed: 500,
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            autoplay: false,
+                        }}
+                    />
                     {/* <Image src={selectedImage} alt='Product Image 1' preview={false} style={{ height: '500px' }} /> */}
                     <Row style={{ paddingTop: '10px', justifyContent: 'center', alignItems: 'flex-end', gap: '10px', marginTop: '10px' }}>
                         {productImages.map((img, idx) => {
@@ -210,8 +250,27 @@ const ProductDetailsComponent = ({ productId }) => {
                             value={comment}
                             onChange={e => setComment(e.target.value)}
                         />
-                        <div style={{ textAlign: 'end', marginTop: '10px' }}>
-                            <Button style={{ width: '80px' }}>Đăng</Button>
+                        <div style={{ textAlign: 'end', margin: '10px 0 20px 0' }}>
+                            <Button
+                                onClick={handleSubmit}
+                                style={{ width: '80px' }}>Đăng</Button>
+                        </div>
+                        <div style={{ width: '100%' }}>
+                            {productDetails?.comments?.map(comment => {
+                                return (
+                                    <WrapperComment>
+                                        <div style={{ padding: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span style={{ fontWeight: 'bold', fontStyle: 'italic' }}>{comment.name}</span>
+                                                {user?.isAdmin && (
+                                                    <span><DeleteOutlined /></span>
+                                                )}
+                                            </div>
+                                            <div>{comment.comment}</div>
+                                        </div>
+                                    </WrapperComment>
+                                )
+                            })}
                         </div>
                     </Col>
                 </Row>

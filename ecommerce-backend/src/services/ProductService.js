@@ -2,7 +2,7 @@ const Product = require('../models/ProductModel');
 
 const createProduct = (newProduct) => {
     return new Promise(async (resolve, reject) => {
-        const { name, image, type, countInStock, price, rating, description, discount } = newProduct
+        const { name, image, type, countInStock, price, description, discount } = newProduct
         try {
 
             const checkProduct = await Product.findOne({
@@ -20,7 +20,6 @@ const createProduct = (newProduct) => {
                 type,
                 countInStock,
                 price,
-                rating,
                 description,
                 discount
             });
@@ -207,6 +206,60 @@ const getAllType = () => {
     })
 }
 
+const createProductComment = (productId, data, user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const product = await Product.findById(productId)
+
+            const alreadyCommented = product.comments.find(comment =>
+                comment.user.toString() === user._id.toString()
+            )
+            if (alreadyCommented) {
+                return resolve({
+                    status: 'ERR',
+                    message: 'Bạn đã đánh giá sản phẩm này rồi!'
+                })
+            }
+
+            const { comment, rate } = data
+            if (!comment || !rate || isNaN(Number(rate))) {
+                return resolve({
+                    status: 'ERR',
+                    message: 'Vui lòng nhập đánh giá hợp lệ'
+                });
+            }
+
+            if (!user.name) {
+                return resolve({
+                    status: 'ERR',
+                    message: 'Vui lòng thiết lập tên của bạn!'
+                });
+            }
+
+
+            const newComment = {
+                user: user._id,
+                name: user.name,
+                rating: Number(rate),
+                comment
+            }
+
+            product.comments.push(newComment)
+            product.rating =
+                product.comments.reduce((acc, item) => item.rating + acc, 0) / product.comments.length;
+            await product.save()
+
+            resolve({
+                status: 'OK',
+                message: 'Đánh giá sản phẩm thành công',
+                data: product
+            })
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 
 module.exports = {
     createProduct,
@@ -215,5 +268,6 @@ module.exports = {
     getAllProduct,
     deleteProduct,
     deleteManyProduct,
-    getAllType
+    getAllType,
+    createProductComment
 }

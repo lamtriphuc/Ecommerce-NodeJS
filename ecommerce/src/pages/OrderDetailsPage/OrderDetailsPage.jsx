@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as OrderService from '../../services/OrderService'
 import { useQuery } from '@tanstack/react-query'
 import { WrapperCard, WrapperContent, WrapperInfo, WrapperLabel, WrapperLabelHeader, WrapperPrice, WrapperProduct } from './style'
 import { Col, Divider, Row } from 'antd'
-import { convertPrice } from '../../utils'
+import { convertPrice, formattedDate } from '../../utils'
 import StepComponent from '../../components/StepComponent/StepComponent'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import { orderConstant } from '../../constant'
@@ -34,25 +34,16 @@ const OrderDetailsPage = () => {
     const { data, isPending } = queryOrderDetails
     const { orderItems, shippingAddress } = data?.data || {}
     const orderDetails = data?.data || {}
-    console.log('orderDetails', orderDetails)
+
+    const date = new Date(orderDetails?.createdAt);
+    date.setDate(date.getDate() + 5);
+    const formatted = formattedDate(date);
 
     const process = [
-        {
-            title: 'Đang chờ xử lý',
-            // description: 'Chúng tôi đã nhận được đơn hàng của bạn và đang chuẩn bị.'
-        },
-        {
-            title: 'Đang đóng gói và giao hàng',
-            // description: 'Đơn hàng của bạn đã được đóng gói và gửi đến đơn vị vận chuyển.'
-        },
-        {
-            title: 'Đang giao',
-            // description: 'Đơn hàng đang được giao đến bạn'
-        },
-        {
-            title: 'Hoàn tất',
-            // description: 'Đơn hàng đã được giao thành công'
-        }
+        { title: 'Đang chờ xử lý' },            // => 'pending'
+        { title: 'Đang đóng gói và giao hàng' },// => 'confirmed'
+        { title: 'Đang giao' },                 // => 'shipping'
+        { title: 'Hoàn tất' }                   // => 'delivered'
     ]
 
     const mutationDelete = useMutationHooks(
@@ -82,6 +73,14 @@ const OrderDetailsPage = () => {
         }
     }, [isPendingCancel, dataCancel])
 
+    const priceMemo = useMemo(() => {
+        const result = orderDetails?.orderItems?.reduce((total, cur) => {
+            return total + (cur.price * cur.amount)
+        }, 0)
+        return result
+    }, [orderDetails])
+
+
     return (
         <div style={{ width: '100%', minHeight: 'calc(100vh - 62px)', background: '#f5f5fa' }}>
             <div style={{ width: '1000px', height: '100%', margin: '0 auto' }}>
@@ -92,7 +91,10 @@ const OrderDetailsPage = () => {
                     <StepComponent
                         labelPlacement="vertical"
                         items={process}
-                        current={0}
+                        current={
+                            orderDetails?.shippingStatus === 'pending' ? 0 : orderDetails?.shippingStatus === 'confirmed' ? 1 :
+                                orderDetails?.shippingStatus === 'shipping' ? 2 : 3
+                        }
                     />
                 </WrapperCard>
                 <WrapperCard>
@@ -127,7 +129,7 @@ const OrderDetailsPage = () => {
                         <Col span={12}>
                             <WrapperInfo>
                                 <p className='label'>Dự kiến: </p>
-                                <p className='content'>19/02/2025</p>
+                                <p className='content'>{formattedDate(date)}</p>
                             </WrapperInfo>
                         </Col>
                     </Row>
@@ -146,7 +148,7 @@ const OrderDetailsPage = () => {
                                 <WrapperProduct>
                                     <div style={{ display: 'flex', alignItems: 'center' }} >
                                         <img
-                                            src={item?.image}
+                                            src={item?.image.split(',')[0]}
                                             style={{ width: '70px', height: '70px', objectFit: 'cover', padding: '0 10px 0 0', cursor: 'pointer' }} alt='Ảnh' />
                                         <div
                                             style={{
@@ -168,11 +170,11 @@ const OrderDetailsPage = () => {
                     })}
                     <WrapperPrice>
                         <WrapperLabel>Tạm tính:</WrapperLabel>
-                        <WrapperContent>{convertPrice(data?.data?.totalPrice)}</WrapperContent>
+                        <WrapperContent>{convertPrice(priceMemo)}</WrapperContent>
                     </WrapperPrice>
                     <WrapperPrice>
                         <WrapperLabel>Giảm giá:</WrapperLabel>
-                        <div style={{ color: 'rgb(22, 163, 74)' }}>1000000</div>
+                        <div style={{ color: 'rgb(22, 163, 74)' }}>{convertPrice(orderDetails.discountPrice)}</div>
                     </WrapperPrice>
                     <WrapperPrice>
                         <WrapperLabel>Phí vận chuyển:</WrapperLabel>

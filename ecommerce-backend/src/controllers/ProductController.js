@@ -2,9 +2,9 @@ const ProductService = require('../services/ProductService')
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, countInStock, price, rating, description, discount } = req.body
+        const { name, image, type, countInStock, price, description, discount } = req.body
 
-        if (!name || !image || !type || !countInStock || !price || !rating || !description || !discount) {
+        if (!name || !image || !type || !countInStock || !price || !description || !discount) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
@@ -116,6 +116,28 @@ const getAllType = async (req, res) => {
     }
 }
 
+const createProductComment = async (req, res) => {
+    try {
+        const productId = req.params.id
+        const data = req.body
+        const user = req.user
+        if (!productId) {
+            return res.status(404).json({
+                status: 'ERR',
+                message: 'Product not found'
+            })
+        }
+
+        const response = await ProductService.createProductComment(productId, data, user)
+        return res.status(200).json(response);
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
 
 module.exports = {
     createProduct,
@@ -124,5 +146,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     deleteManyProduct,
-    getAllType
+    getAllType,
+    createProductComment
 }

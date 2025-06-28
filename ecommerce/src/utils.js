@@ -79,3 +79,7 @@ export const convertPrice = (price) => {
         return null
     }
 }
+
+export const formattedDate = (fiveDaysLater) => {
+    return `${fiveDaysLater.getDate().toString().padStart(2, '0')}/${(fiveDaysLater.getMonth() + 1).toString().padStart(2, '0')}/${fiveDaysLater.getFullYear()}`;
+};

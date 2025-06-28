@@ -36,7 +36,6 @@ const AdminProduct = () => {
         name: '',
         price: '',
         description: '',
-        rating: '',
         type: '',
         countInStock: '',
         image: '',
@@ -47,7 +46,6 @@ const AdminProduct = () => {
         name: '',
         price: '',
         description: '',
-        rating: '',
         type: '',
         countInStock: '',
         image: '',
@@ -64,7 +62,6 @@ const AdminProduct = () => {
                 name,
                 price,
                 description,
-                rating,
                 type,
                 countInStock,
                 image,
@@ -74,7 +71,6 @@ const AdminProduct = () => {
                 name,
                 price,
                 description,
-                rating,
                 type,
                 countInStock,
                 image,
@@ -129,7 +125,6 @@ const AdminProduct = () => {
                 name: res?.data?.name,
                 price: res?.data?.price,
                 description: res?.data?.description,
-                rating: res?.data?.rating,
                 type: res?.data?.type,
                 countInStock: res?.data?.countInStock,
                 image: res?.data?.image,
@@ -235,17 +230,6 @@ const AdminProduct = () => {
                 }
             },
         },
-        // render: text =>
-        //     searchedColumn === dataIndex ? (
-        //         <Highlighter
-        //             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-        //             searchWords={[searchText]}
-        //             autoEscape
-        //             textToHighlight={text ? text.toString() : ''}
-        //         />
-        //     ) : (
-        //         text
-        //     ),
     });
 
     const columns = [
@@ -350,7 +334,6 @@ const AdminProduct = () => {
                     name: '',
                     price: '',
                     description: '',
-                    rating: '',
                     type: '',
                     countInStock: '',
                     image: '',
@@ -375,7 +358,6 @@ const AdminProduct = () => {
                     name: '',
                     price: '',
                     description: '',
-                    rating: '',
                     type: '',
                     countInStock: '',
                     image: '',
@@ -440,13 +422,10 @@ const AdminProduct = () => {
         setIsLoadingUploadImage(true)
         const urls = await uploadImagesToCloudinary({ fileList });
         setIsLoadingUploadImage(false)
-        console.log('urls', urls)
-        console.log('stateProduct.image', stateProduct.image)
         const params = {
             name: stateProduct.name,
             price: stateProduct.price,
             description: stateProduct.description,
-            rating: stateProduct.rating,
             type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
             countInStock: stateProduct.countInStock,
             image: urls,
@@ -518,39 +497,47 @@ const AdminProduct = () => {
         return urls.join(',')
     }
 
-    const handleOnChangeImageDetails = async ({ fileList }) => {
-        const file = fileList[0]?.originFileObj;
-        if (!file) return;
+    // const handleOnChangeImageDetails = async ({ fileList }) => {
+    //     const file = fileList[0]?.originFileObj;
+    //     if (!file) return;
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'upload-image');
+    //     const formData = new FormData();
+    //     formData.append('file', file);
+    //     formData.append('upload_preset', 'upload-image');
 
-        try {
-            const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
+    //     try {
+    //         const res = await fetch('https://api.cloudinary.com/v1_1/ddpy7dxxa/image/upload', {
+    //             method: 'POST',
+    //             body: formData
+    //         });
+    //         const data = await res.json();
 
-            if (data.secure_url) {
-                setStateProductDetails({
-                    ...stateProductDetails,
-                    image: data.secure_url
-                });
-            } else {
-                console.error('Upload lỗi:', data);
-            }
-        } catch (err) {
-            console.error('Lỗi upload Cloudinary:', err);
+    //         if (data.secure_url) {
+    //             setStateProductDetails({
+    //                 ...stateProductDetails,
+    //                 image: data.secure_url
+    //             });
+    //         } else {
+    //             console.error('Upload lỗi:', data);
+    //         }
+    //     } catch (err) {
+    //         console.error('Lỗi upload Cloudinary:', err);
+    //     }
+    // }
+
+    const onUpdateProduct = async () => {
+        setIsLoadingUploadImage(true)
+        const urls = await uploadImagesToCloudinary({ fileList });
+        setIsLoadingUploadImage(false)
+
+        const updatedData = {
+            ...stateProductDetails,
+            image: urls
         }
-    }
-
-    const onUpdateProduct = () => {
         mutationUpdate.mutate({
             id: rowSelected,
             token: user.access_token,
-            ...stateProductDetails
+            ...updatedData
         }, {
             onSettled: () => {
                 queryProduct.refetch()
@@ -686,17 +673,6 @@ const AdminProduct = () => {
                             />
                         </Form.Item>
                         <Form.Item
-                            label="Đánh giá"
-                            name="rating"
-                            rules={[{ required: true, message: 'Hãy nhập đánh giá sản phẩm!' }]}
-                        >
-                            <InputComponent
-                                value={stateProduct.rating}
-                                onChange={handleOnChage}
-                                name='rating'
-                            />
-                        </Form.Item>
-                        <Form.Item
                             label="Giảm giá"
                             name="discount"
                             rules={[{ required: true, message: 'Hãy nhập giảm giá cho sản phẩm!' }]}
@@ -710,6 +686,16 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Ảnh"
                             name="image"
+                            rules={[
+                                {
+                                    validator: (_, value) => {
+                                        if (!fileList || fileList.length < 2) {
+                                            return Promise.reject(new Error('Vui lòng chọn ít nhất 2 ảnh'));
+                                        }
+                                        return Promise.resolve();
+                                    },
+                                },
+                            ]}
                         >
                             <WrapperUploadFile style={{ marginBottom: '10px' }}
                                 onChange={({ fileList }) => { setFileList(fileList) }}
@@ -736,7 +722,7 @@ const AdminProduct = () => {
             </ModalComponent>
 
             <DrawerComponent title='Chi tiết sản phẩm' isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width='50%'>
-                <Loading isLoading={isLoadingUpdate || isPendingUpdated}>
+                <Loading isLoading={isLoadingUpdate || isPendingUpdated || isLoadingUploadImage}>
                     <Form
                         form={formUpdate}
                         name="basic"
@@ -805,7 +791,7 @@ const AdminProduct = () => {
                                 onChange={handleOnChageDetails}
                             />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             label="Đánh giá"
                             name="rating"
                             rules={[{ required: true, message: 'Hãy nhập đánh giá sản phẩm!' }]}
@@ -815,7 +801,7 @@ const AdminProduct = () => {
                                 onChange={handleOnChageDetails}
                                 name='rating'
                             />
-                        </Form.Item>
+                        </Form.Item> */}
                         <Form.Item
                             label="Giảm giá"
                             name="discount"
@@ -830,19 +816,30 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Ảnh"
                             name="image"
-                            rules={[{ required: true, message: 'Hãy nhập ảnh sản phẩm!' }]}
+                            rules={[
+                                {
+                                    validator: (_, value) => {
+                                        if (!fileList || fileList.length < 2) {
+                                            return Promise.reject(new Error('Vui lòng chọn ít nhất 2 ảnh'));
+                                        }
+                                        return Promise.resolve();
+                                    },
+                                },
+                            ]}
                         >
-                            <WrapperUploadFile style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onChange={handleOnChangeImageDetails} maxCount={4} multiple beforeUpload={() => false} >
+                            <WrapperUploadFile style={{ marginBottom: '10px' }}
+                                onChange={({ fileList }) => { setFileList(fileList) }}
+                                maxCount={4}
+                                multiple
+                                beforeUpload={() => false}
+                            >
                                 <Button>Upload</Button>
-                                {stateProductDetails?.image && (
-                                    <img src={stateProductDetails?.image} alt='product-image' style={{
-                                        height: '60px',
-                                        width: '60px',
-                                        objectFit: 'cover',
-                                        float: 'right'
-                                    }} />
-                                )}
                             </WrapperUploadFile>
+                            {fileList.map((fileName, index) => {
+                                return (
+                                    <div><FileImageTwoTone />{fileName.name}</div>
+                                )
+                            })}
                         </Form.Item>
 
                         <Form.Item label={null}>

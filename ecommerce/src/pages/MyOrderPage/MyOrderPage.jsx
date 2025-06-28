@@ -71,7 +71,7 @@ const MyOrderPage = () => {
                                         <WrapperOrderStatus>
                                             <span style={{ fontWeight: 'bold' }}>Trạng thái</span>
                                             <div>
-                                                <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Giao hàng: </span> {order?.isDelivered ? 'Đã giao' : 'Chưa giao'}
+                                                <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Giao hàng: </span><span style={{ color: order?.shippingStatus === 'delivered' ? '#4ded4d' : 'unset' }}> {order?.shippingStatus === 'pending' ? 'Đang chờ xác nhận' : order?.shippingStatus === 'shipping' ? 'Đang giao' : 'Đã giao'}</span>
                                             </div>
                                             <div>
                                                 <span style={{ fontSize: '14px', color: 'rgb(255, 66, 78' }}>Thanh toán: </span><span style={{ color: order?.isPaid ? '#4ded4d' : 'unset' }}> {order?.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
