@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { refreshToken } from '../../services/UserService'
 
 const initialState = {
     _id: '',
@@ -9,7 +10,9 @@ const initialState = {
     avatar: '',
     access_token: '',
     isAdmin: false,
-    city: ''
+    city: '',
+    refreshToken: ''
+
 }
 
 export const userSlide = createSlice({
@@ -17,7 +20,7 @@ export const userSlide = createSlice({
     initialState,
     reducers: {
         updateUser: (state, action) => {
-            const { _id, name = '', email = '', access_token = '', phone = '', address = '', avatar = '', isAdmin, city = '' } = action.payload
+            const { _id, name = '', email = '', access_token = '', phone = '', address = '', avatar = '', isAdmin, city = '', refreshToken = '' } = action.payload
             state._id = _id
             state.name = name
             state.email = email
@@ -27,6 +30,7 @@ export const userSlide = createSlice({
             state.access_token = access_token
             state.isAdmin = isAdmin
             state.city = city
+            state.refreshToken = refreshToken
         },
 
         resetUser: (state) => {
@@ -39,6 +43,7 @@ export const userSlide = createSlice({
             state.access_token = ''
             state.isAdmin = false
             state.city = ''
+            state.refreshToken = ''
         }
     },
 })
